@@ -9,12 +9,16 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90",
-        destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
+        default: "bg-primary text-primary-foreground hover:bg-primary/90 shadow-soft",
+        destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90 shadow-soft",
         outline: "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
-        secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+        secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80 shadow-soft",
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
+        // SafeRides Theme Variants
+        hero: "bg-royal-blue text-white hover:bg-royal-blue-dark gradient-primary shadow-strong text-lg font-bold",
+        cta: "bg-royal-blue text-white hover:bg-royal-blue-dark shadow-medium font-semibold",
+        "royal-outline": "border-2 border-royal-blue text-royal-blue bg-transparent hover:bg-royal-blue hover:text-white font-semibold",
       },
       size: {
         default: "h-10 px-4 py-2",

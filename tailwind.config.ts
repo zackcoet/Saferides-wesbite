@@ -57,6 +57,12 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        // Royal Blue Theme Colors
+        "royal-blue": {
+          DEFAULT: "hsl(var(--royal-blue))",
+          dark: "hsl(var(--royal-blue-dark))",
+          light: "hsl(var(--royal-blue-light))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
