@@ -1,4 +1,6 @@
 import { Mail, MapPin } from "lucide-react";
+import PrivacyPolicy from "./PrivacyPolicy";
+import TermsConditions from "./TermsConditions";
 
 const Footer = () => {
   const scrollToSection = (sectionId: string) => {
@@ -95,6 +97,16 @@ const Footer = () => {
                 >
                   Join Waitlist
                 </a>
+              </li>
+              <li className="pt-2 border-t border-white/20">
+                <div className="space-y-2">
+                  <div className="text-white/80">
+                    <PrivacyPolicy />
+                  </div>
+                  <div className="text-white/80">
+                    <TermsConditions />
+                  </div>
+                </div>
               </li>
             </ul>
           </div>

@@ -43,15 +43,22 @@ const Navigation = () => {
                 About
               </button>
               <button 
-                onClick={() => scrollToSection('founder')}
+                onClick={() => scrollToSection('insurance')}
                 className="text-gray-700 hover:text-royal-blue font-medium transition-colors px-3 py-2 rounded-lg hover:bg-royal-blue-light/20"
               >
-                Our Founder
+                Insurance
+              </button>
+              <button 
+                onClick={() => scrollToSection('contact')}
+                className="text-gray-700 hover:text-royal-blue font-medium transition-colors px-3 py-2 rounded-lg hover:bg-royal-blue-light/20"
+              >
+                Contact
               </button>
               <Button 
                 variant="cta" 
                 size="sm"
                 onClick={() => scrollToSection('join')}
+                className="text-white"
               >
                 Join Waitlist
               </Button>
@@ -87,16 +94,22 @@ const Navigation = () => {
                 About
               </button>
               <button 
-                onClick={() => scrollToSection('founder')}
+                onClick={() => scrollToSection('insurance')}
                 className="block w-full text-left px-3 py-2 text-gray-700 hover:text-royal-blue font-medium"
               >
-                Our Founder
+                Insurance
+              </button>
+              <button 
+                onClick={() => scrollToSection('contact')}
+                className="block w-full text-left px-3 py-2 text-gray-700 hover:text-royal-blue font-medium"
+              >
+                Contact
               </button>
               <div className="px-3 py-2">
                 <Button 
                   variant="cta" 
                   size="sm" 
-                  className="w-full"
+                  className="w-full text-white"
                   onClick={() => scrollToSection('join')}
                 >
                   Join Waitlist
