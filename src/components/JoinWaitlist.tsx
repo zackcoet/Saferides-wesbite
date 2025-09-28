@@ -58,7 +58,7 @@ const JoinWaitlist = () => {
               asChild
               variant="hero"
               size="lg"
-              className="bg-white text-royal-blue hover:bg-white/90 shadow-strong px-8 py-4 text-xl font-bold"
+              className="bg-royal-blue text-white hover:bg-royal-blue-dark shadow-strong px-8 py-4 text-xl font-bold"
             >
               <a 
                 href="https://forms.gle/2Ln5GGeE6R65V7HH6" 
