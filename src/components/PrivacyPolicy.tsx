@@ -20,13 +20,13 @@ const PrivacyPolicy = () => {
         <ScrollArea className="px-6 pb-6 max-h-[60vh]">
           <div className="space-y-6 text-sm leading-relaxed">
             <p className="text-gray-700">
-              This Privacy Policy explains how Coetzee Tech LLC (doing business as SafeRides™, &quot;SafeRides,&quot; &quot;we,&quot; &quot;us,&quot; or &quot;our&quot;) collects, uses, shares, and protects information when you use our services in the United States (the &quot;Services&quot;), including our mobile applications, websites, and related features (such as ride requests, driver onboarding, scheduling, safety tools, and customer support).
+              This Privacy Policy explains how Coetzee Tech Inc. (doing business as SafeRides™, &quot;SafeRides,&quot; &quot;we,&quot; &quot;us,&quot; or &quot;our&quot;) collects, uses, shares, and protects information when you use our services in the United States (the &quot;Services&quot;), including our mobile applications, websites, and related features (such as ride requests, driver onboarding, scheduling, safety tools, and customer support).
             </p>
 
             <section>
               <h3 className="text-lg font-semibold text-gray-900 mb-3">1) Who We Are</h3>
               <ul className="space-y-1 text-gray-700">
-                <li><strong>Company:</strong> Coetzee Tech LLC (d/b/a SafeRides™)</li>
+                <li><strong>Company:</strong> Coetzee Tech Inc. (d/b/a SafeRides™)</li>
                 <li><strong>Business Address:</strong> 214 S Gregg St, Apt A, Columbia, SC 29205, United States</li>
                 <li><strong>Privacy Contact Email:</strong> saferideshelp@gmail.com</li>
               </ul>
@@ -259,7 +259,7 @@ const PrivacyPolicy = () => {
               <p className="text-gray-700 mb-2">For questions, complaints, or privacy requests:</p>
               <ul className="space-y-1 text-gray-700">
                 <li><strong>Email:</strong> saferideshelp@gmail.com</li>
-                <li><strong>Mail:</strong> Coetzee Tech LLC (SafeRides™), 214 S Gregg St, Apt A, Columbia, SC 29205, United States</li>
+                <li><strong>Mail:</strong> Coetzee Tech Inc. (SafeRides™), 214 S Gregg St, Apt A, Columbia, SC 29205, United States</li>
               </ul>
             </section>
           </div>

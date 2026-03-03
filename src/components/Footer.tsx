@@ -85,7 +85,7 @@ const Footer = () => {
             <ul className="space-y-3">
               <li>
                 <span className="text-white/80">
-                  Operated by Coetzee Tech LLC
+                  Operated by Coetzee Tech Inc.
                 </span>
               </li>
               <li>
