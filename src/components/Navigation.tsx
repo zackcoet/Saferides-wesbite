@@ -55,6 +55,19 @@ const Navigation = () => {
                 Contact
               </button>
               <Button 
+                variant="outline" 
+                size="sm"
+                asChild
+              >
+                <a 
+                  href="https://apps.apple.com/us/app/saferides-driver/id6751057062" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                >
+                  Driver App
+                </a>
+              </Button>
+              <Button 
                 variant="cta" 
                 size="sm"
                 onClick={() => scrollToSection('join')}
@@ -105,6 +118,22 @@ const Navigation = () => {
               >
                 Contact
               </button>
+              <div className="px-3 py-2">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="w-full"
+                  asChild
+                >
+                  <a 
+                    href="https://apps.apple.com/us/app/saferides-driver/id6751057062" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                  >
+                    Driver App
+                  </a>
+                </Button>
+              </div>
               <div className="px-3 py-2">
                 <Button 
                   variant="cta" 

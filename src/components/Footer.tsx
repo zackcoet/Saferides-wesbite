@@ -76,6 +76,16 @@ const Footer = () => {
                   Join Waitlist
                 </button>
               </li>
+              <li>
+                <a 
+                  href="https://apps.apple.com/us/app/saferides-driver/id6751057062" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-white/80 hover:text-white transition-colors"
+                >
+                  Download Driver App
+                </a>
+              </li>
             </ul>
           </div>
 

@@ -54,6 +54,23 @@ const Hero = () => {
           >
             Learn More
           </Button>
+          
+          <Button 
+            variant="royal-outline" 
+            size="lg"
+            asChild
+            className="px-8 py-4 text-xl bg-white/10 backdrop-blur-sm border-white/50 text-white hover:bg-white hover:text-royal-blue"
+          >
+            <a 
+              href="https://apps.apple.com/us/app/saferides-driver/id6751057062" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="inline-flex items-center"
+            >
+              <span className="mr-2">🍎</span>
+              Download Driver App
+            </a>
+          </Button>
         </div>
 
         {/* Trust Indicators */}
