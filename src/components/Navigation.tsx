@@ -54,19 +54,36 @@ const Navigation = () => {
               >
                 Contact
               </button>
-              <Button 
-                variant="outline" 
-                size="sm"
-                asChild
-              >
-                <a 
-                  href="https://apps.apple.com/us/app/saferides-driver/id6751057062" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
+              <div className="flex flex-col gap-1.5 items-stretch">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  asChild
+                  className="whitespace-nowrap"
                 >
-                  Driver App
-                </a>
-              </Button>
+                  <a 
+                    href="https://apps.apple.com/us/app/saferides-driver/id6751057062" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                  >
+                    Driver App
+                  </a>
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  asChild
+                  className="whitespace-nowrap"
+                >
+                  <a 
+                    href="https://apps.apple.com/us/app/saferides-rider/id6750380495" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                  >
+                    Rider App
+                  </a>
+                </Button>
+              </div>
               <Button 
                 variant="cta" 
                 size="sm"
@@ -118,7 +135,7 @@ const Navigation = () => {
               >
                 Contact
               </button>
-              <div className="px-3 py-2">
+              <div className="px-3 py-2 space-y-2">
                 <Button 
                   variant="outline" 
                   size="sm" 
@@ -131,6 +148,20 @@ const Navigation = () => {
                     rel="noopener noreferrer"
                   >
                     Driver App
+                  </a>
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="w-full"
+                  asChild
+                >
+                  <a 
+                    href="https://apps.apple.com/us/app/saferides-rider/id6750380495" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                  >
+                    Rider App
                   </a>
                 </Button>
               </div>

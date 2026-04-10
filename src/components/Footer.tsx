@@ -1,5 +1,5 @@
 import { Mail, MapPin } from "lucide-react";
-import PrivacyPolicy from "./PrivacyPolicy";
+import { Link } from "react-router-dom";
 import TermsConditions from "./TermsConditions";
 
 const Footer = () => {
@@ -86,6 +86,16 @@ const Footer = () => {
                   Download Driver App
                 </a>
               </li>
+              <li>
+                <a 
+                  href="https://apps.apple.com/us/app/saferides-rider/id6750380495" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-white/80 hover:text-white transition-colors"
+                >
+                  Download Rider App
+                </a>
+              </li>
             </ul>
           </div>
 
@@ -111,7 +121,9 @@ const Footer = () => {
               <li className="pt-2 border-t border-white/20">
                 <div className="space-y-2">
                   <div className="text-white/80">
-                    <PrivacyPolicy />
+                    <Link to="/privacy" className="text-sm text-gray-600 hover:text-royal-blue">
+                      Privacy Policy
+                    </Link>
                   </div>
                   <div className="text-white/80">
                     <TermsConditions />

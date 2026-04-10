@@ -55,22 +55,40 @@ const Hero = () => {
             Learn More
           </Button>
           
-          <Button 
-            variant="royal-outline" 
-            size="lg"
-            asChild
-            className="px-8 py-4 text-xl bg-white/10 backdrop-blur-sm border-white/50 text-white hover:bg-white hover:text-royal-blue"
-          >
-            <a 
-              href="https://apps.apple.com/us/app/saferides-driver/id6751057062" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="inline-flex items-center"
+          <div className="flex flex-col gap-2 items-center w-full sm:w-auto">
+            <Button 
+              variant="royal-outline" 
+              size="lg"
+              asChild
+              className="px-8 py-4 text-xl bg-white/10 backdrop-blur-sm border-white/50 text-white hover:bg-white hover:text-royal-blue w-full sm:w-auto"
             >
-              <span className="mr-2">🍎</span>
-              Download Driver App
-            </a>
-          </Button>
+              <a 
+                href="https://apps.apple.com/us/app/saferides-driver/id6751057062" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center"
+              >
+                <span className="mr-2">🍎</span>
+                Download Driver App
+              </a>
+            </Button>
+            <Button 
+              variant="royal-outline" 
+              size="lg"
+              asChild
+              className="px-8 py-4 text-xl bg-white/10 backdrop-blur-sm border-white/50 text-white hover:bg-white hover:text-royal-blue w-full sm:w-auto"
+            >
+              <a 
+                href="https://apps.apple.com/us/app/saferides-rider/id6750380495" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center"
+              >
+                <span className="mr-2">🍎</span>
+                Download Rider App
+              </a>
+            </Button>
+          </div>
         </div>
 
         {/* Trust Indicators */}
