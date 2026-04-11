@@ -1,6 +1,5 @@
 import { Mail, MapPin } from "lucide-react";
 import { Link } from "react-router-dom";
-import TermsConditions from "./TermsConditions";
 
 const Footer = () => {
   const scrollToSection = (sectionId: string) => {
@@ -126,7 +125,9 @@ const Footer = () => {
                     </Link>
                   </div>
                   <div className="text-white/80">
-                    <TermsConditions />
+                    <Link to="/terms" className="text-sm text-gray-600 hover:text-royal-blue">
+                      Terms & Conditions
+                    </Link>
                   </div>
                 </div>
               </li>
