@@ -43,47 +43,25 @@ const Navigation = () => {
                 About
               </button>
               <button 
-                onClick={() => scrollToSection('insurance')}
-                className="text-gray-700 hover:text-royal-blue font-medium transition-colors px-3 py-2 rounded-lg hover:bg-royal-blue-light/20"
-              >
-                Insurance
-              </button>
-              <button 
                 onClick={() => scrollToSection('contact')}
                 className="text-gray-700 hover:text-royal-blue font-medium transition-colors px-3 py-2 rounded-lg hover:bg-royal-blue-light/20"
               >
                 Contact
               </button>
-              <div className="flex flex-col gap-1.5 items-stretch">
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  asChild
-                  className="whitespace-nowrap"
+              <Button 
+                variant="outline" 
+                size="sm"
+                asChild
+                className="whitespace-nowrap"
+              >
+                <a 
+                  href="https://saferides-73eb2.web.app/promo" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
                 >
-                  <a 
-                    href="https://apps.apple.com/us/app/saferides-driver/id6751057062" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                  >
-                    Driver App
-                  </a>
-                </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  asChild
-                  className="whitespace-nowrap"
-                >
-                  <a 
-                    href="https://apps.apple.com/us/app/saferides-rider/id6750380495" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                  >
-                    Rider App
-                  </a>
-                </Button>
-              </div>
+                  Download Apps
+                </a>
+              </Button>
               <Button 
                 variant="cta" 
                 size="sm"
@@ -124,18 +102,12 @@ const Navigation = () => {
                 About
               </button>
               <button 
-                onClick={() => scrollToSection('insurance')}
-                className="block w-full text-left px-3 py-2 text-gray-700 hover:text-royal-blue font-medium"
-              >
-                Insurance
-              </button>
-              <button 
                 onClick={() => scrollToSection('contact')}
                 className="block w-full text-left px-3 py-2 text-gray-700 hover:text-royal-blue font-medium"
               >
                 Contact
               </button>
-              <div className="px-3 py-2 space-y-2">
+              <div className="px-3 py-2">
                 <Button 
                   variant="outline" 
                   size="sm" 
@@ -143,25 +115,11 @@ const Navigation = () => {
                   asChild
                 >
                   <a 
-                    href="https://apps.apple.com/us/app/saferides-driver/id6751057062" 
+                    href="https://saferides-73eb2.web.app/promo" 
                     target="_blank" 
                     rel="noopener noreferrer"
                   >
-                    Driver App
-                  </a>
-                </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="w-full"
-                  asChild
-                >
-                  <a 
-                    href="https://apps.apple.com/us/app/saferides-rider/id6750380495" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                  >
-                    Rider App
+                    Download Apps
                   </a>
                 </Button>
               </div>

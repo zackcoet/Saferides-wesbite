@@ -77,22 +77,12 @@ const Footer = () => {
               </li>
               <li>
                 <a 
-                  href="https://apps.apple.com/us/app/saferides-driver/id6751057062" 
+                  href="https://saferides-73eb2.web.app/promo" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="text-white/80 hover:text-white transition-colors"
                 >
-                  Download Driver App
-                </a>
-              </li>
-              <li>
-                <a 
-                  href="https://apps.apple.com/us/app/saferides-rider/id6750380495" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="text-white/80 hover:text-white transition-colors"
-                >
-                  Download Rider App
+                  Download Apps
                 </a>
               </li>
             </ul>

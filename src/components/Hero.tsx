@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Smartphone } from "lucide-react";
 import heroImage from "@/assets/hero-image.jpg";
 
 const Hero = () => {
@@ -55,40 +55,22 @@ const Hero = () => {
             Learn More
           </Button>
           
-          <div className="flex flex-col gap-2 items-center w-full sm:w-auto">
-            <Button 
-              variant="royal-outline" 
-              size="lg"
-              asChild
-              className="px-8 py-4 text-xl bg-white/10 backdrop-blur-sm border-white/50 text-white hover:bg-white hover:text-royal-blue w-full sm:w-auto"
+          <Button 
+            variant="royal-outline" 
+            size="lg"
+            asChild
+            className="px-8 py-4 text-xl bg-white/10 backdrop-blur-sm border-white/50 text-white hover:bg-white hover:text-royal-blue w-full sm:w-auto"
+          >
+            <a 
+              href="https://saferides-73eb2.web.app/promo" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center"
             >
-              <a 
-                href="https://apps.apple.com/us/app/saferides-driver/id6751057062" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center"
-              >
-                <span className="mr-2">🍎</span>
-                Download Driver App
-              </a>
-            </Button>
-            <Button 
-              variant="royal-outline" 
-              size="lg"
-              asChild
-              className="px-8 py-4 text-xl bg-white/10 backdrop-blur-sm border-white/50 text-white hover:bg-white hover:text-royal-blue w-full sm:w-auto"
-            >
-              <a 
-                href="https://apps.apple.com/us/app/saferides-rider/id6750380495" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center"
-              >
-                <span className="mr-2">🍎</span>
-                Download Rider App
-              </a>
-            </Button>
-          </div>
+              <Smartphone className="mr-2 h-5 w-5" />
+              Download Apps
+            </a>
+          </Button>
         </div>
 
         {/* Trust Indicators */}
