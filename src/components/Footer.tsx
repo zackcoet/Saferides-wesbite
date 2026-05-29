@@ -7,7 +7,7 @@ const NAV_LINKS = [
 ];
 
 // Replace with real contact email
-const CONTACT_EMAIL = "hello@saferidesapp.com";
+const CONTACT_EMAIL = "saferideshelp@gmail.com";
 
 export default function Footer() {
   const scrollTo = (href: string) => {
