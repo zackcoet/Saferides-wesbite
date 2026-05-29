@@ -1,144 +1,77 @@
-import { Mail, MapPin } from "lucide-react";
 import { Link } from "react-router-dom";
 
-const Footer = () => {
-  const scrollToSection = (sectionId: string) => {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
+const NAV_LINKS = [
+  { label: "How it works", href: "#how-it-works" },
+  { label: "Features", href: "#features" },
+  { label: "Drive", href: "#drive" },
+];
+
+// Replace with real contact email
+const CONTACT_EMAIL = "hello@saferidesapp.com";
+
+export default function Footer() {
+  const scrollTo = (href: string) => {
+    if (href.startsWith("#")) {
+      const el = document.getElementById(href.slice(1));
+      if (el) el.scrollIntoView({ behavior: "smooth" });
     }
   };
 
   return (
-    <footer className="bg-royal-blue-dark text-white py-16">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid md:grid-cols-3 gap-8 mb-12">
-          {/* Company Info */}
-          <div>
-            <h3 className="text-2xl font-bold mb-4">SafeRides</h3>
-            <p className="text-white/80 leading-relaxed mb-6">
-              Student rides. Safer. Smarter. Building a trusted community 
-              for secure student transportation.
-            </p>
-            <div className="space-y-3">
-              <div className="flex items-center">
-                <Mail className="h-4 w-4 mr-3 text-royal-blue-light" />
-                <a 
-                  href="mailto:saferideshelp@gmail.com" 
-                  className="text-white/80 hover:text-white transition-colors"
-                >
-                  saferideshelp@gmail.com
-                </a>
-              </div>
-              <div className="flex items-center">
-                <MapPin className="h-4 w-4 mr-3 text-royal-blue-light" />
-                <span className="text-white/80">
-                  Columbia, SC 29201, USA
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Quick Links */}
-          <div>
-            <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
-            <ul className="space-y-3">
-              <li>
-                <button 
-                  onClick={() => scrollToSection('features')}
-                  className="text-white/80 hover:text-white transition-colors"
-                >
-                  Features
-                </button>
-              </li>
-              <li>
-                <button 
-                  onClick={() => scrollToSection('about')}
-                  className="text-white/80 hover:text-white transition-colors"
-                >
-                  About Us
-                </button>
-              </li>
-              <li>
-                <button 
-                  onClick={() => scrollToSection('founder')}
-                  className="text-white/80 hover:text-white transition-colors"
-                >
-                  Our Founder
-                </button>
-              </li>
-              <li>
-                <button 
-                  onClick={() => scrollToSection('join')}
-                  className="text-white/80 hover:text-white transition-colors"
-                >
-                  Join Waitlist
-                </button>
-              </li>
-              <li>
-                <a 
-                  href="https://saferides-73eb2.web.app/promo" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="text-white/80 hover:text-white transition-colors"
-                >
-                  Download Apps
-                </a>
-              </li>
-            </ul>
-          </div>
-
-          {/* Company */}
-          <div>
-            <h4 className="text-lg font-semibold mb-4">Company</h4>
-            <ul className="space-y-3">
-              <li>
-                <span className="text-white/80">
-                  Operated by Coetzee Tech Inc.
-                </span>
-              </li>
-              <li>
-                <a 
-                  href="https://forms.gle/2Ln5GGeE6R65V7HH6" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="text-white/80 hover:text-white transition-colors"
-                >
-                  Join Waitlist
-                </a>
-              </li>
-              <li className="pt-2 border-t border-white/20">
-                <div className="space-y-2">
-                  <div className="text-white/80">
-                    <Link to="/privacy" className="text-sm text-gray-600 hover:text-royal-blue">
-                      Privacy Policy
-                    </Link>
-                  </div>
-                  <div className="text-white/80">
-                    <Link to="/terms" className="text-sm text-gray-600 hover:text-royal-blue">
-                      Terms & Conditions
-                    </Link>
-                  </div>
-                </div>
-              </li>
-            </ul>
-          </div>
+    <footer className="bg-white border-t border-[#E4EAF8]">
+      <div className="mx-auto max-w-6xl px-5 sm:px-8 py-12 flex flex-col gap-10 sm:flex-row sm:items-start sm:justify-between">
+        <div className="flex flex-col gap-3">
+          <span className="text-[#1740A6] font-bold text-lg tracking-tight">
+            Saferides
+          </span>
+          <p className="text-[#0D1B4B]/45 text-sm leading-relaxed max-w-[240px]">
+            Student rideshare at the University of South Carolina.
+          </p>
+          <a
+            href={`mailto:${CONTACT_EMAIL}`}
+            className="text-sm text-[#0D1B4B]/45 hover:text-[#1740A6] transition-colors"
+          >
+            {CONTACT_EMAIL}
+          </a>
         </div>
 
-        {/* Bottom Bar */}
-        <div className="border-t border-white/20 pt-8 text-center">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <p className="text-white/60 text-sm">
-              © 2024 SafeRides. All rights reserved.
-            </p>
-            <p className="text-white/60 text-sm mt-4 md:mt-0">
-              Built for students, by students.
-            </p>
+        <div className="flex gap-12 sm:gap-16">
+          <div className="flex flex-col gap-3">
+            {NAV_LINKS.map((l) => (
+              <button
+                key={l.href}
+                onClick={() => scrollTo(l.href)}
+                className="text-left text-sm text-[#0D1B4B]/60 hover:text-[#1740A6] transition-colors bg-transparent border-none cursor-pointer"
+              >
+                {l.label}
+              </button>
+            ))}
           </div>
+
+          <div className="flex flex-col gap-3">
+            <Link
+              to="/privacy"
+              className="text-sm text-[#0D1B4B]/60 hover:text-[#1740A6] transition-colors"
+            >
+              Privacy
+            </Link>
+            <Link
+              to="/terms"
+              className="text-sm text-[#0D1B4B]/60 hover:text-[#1740A6] transition-colors"
+            >
+              Terms
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      <div className="border-t border-[#E4EAF8]">
+        <div className="mx-auto max-w-6xl px-5 sm:px-8 py-5">
+          <p className="text-xs text-[#0D1B4B]/35">
+            &copy; 2026 Coetzee Tech LLC. All rights reserved.
+          </p>
         </div>
       </div>
     </footer>
   );
-};
-
-export default Footer;
+}

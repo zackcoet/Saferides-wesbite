@@ -1,38 +1,25 @@
-import { useEffect } from "react";
-import Navigation from "@/components/Navigation";
+import Nav from "@/components/Nav";
 import Hero from "@/components/Hero";
+import Manifesto from "@/components/Manifesto";
+import HowItWorks from "@/components/HowItWorks";
 import Features from "@/components/Features";
-import About from "@/components/About";
-import Founder from "@/components/Founder";
-import Contact from "@/components/Contact";
-import JoinWaitlist from "@/components/JoinWaitlist";
+import ForDrivers from "@/components/ForDrivers";
+import DownloadCTA from "@/components/DownloadCTA";
 import Footer from "@/components/Footer";
 
-const Index = () => {
-  useEffect(() => {
-    // Update page title and meta description
-    document.title = "SafeRides - Student Rides. Safer. Smarter.";
-    
-    const metaDescription = document.querySelector('meta[name="description"]');
-    if (metaDescription) {
-      metaDescription.setAttribute('content', 'SafeRides is a secure ride-sharing platform designed exclusively for university students. Join our trusted community for safer student transportation.');
-    }
-  }, []);
-
+export default function Index() {
   return (
-    <div className="min-h-screen">
-      <Navigation />
+    <>
+      <Nav />
       <main>
         <Hero />
+        <Manifesto />
+        <HowItWorks />
         <Features />
-        <About />
-        <Founder />
-        <Contact />
-        <JoinWaitlist />
+        <ForDrivers />
+        <DownloadCTA />
       </main>
       <Footer />
-    </div>
+    </>
   );
-};
-
-export default Index;
+}

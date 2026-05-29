@@ -1,22 +1,15 @@
 import { useEffect } from "react";
-import Navigation from "@/components/Navigation";
+import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 
 const Privacy = () => {
   useEffect(() => {
-    document.title = "Privacy Policy - SafeRides";
-    const metaDescription = document.querySelector('meta[name="description"]');
-    if (metaDescription) {
-      metaDescription.setAttribute(
-        "content",
-        "SafeRides Privacy Policy — how we collect, use, and protect your data."
-      );
-    }
+    document.title = "Privacy Policy - Saferides";
   }, []);
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navigation />
+    <div className="min-h-screen bg-white">
+      <Nav />
       <main>
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
           <header className="mb-8">

@@ -1,97 +1,61 @@
-import { Button } from "@/components/ui/button";
-import { ArrowRight, Smartphone } from "lucide-react";
-import heroImage from "@/assets/hero-image.jpg";
+const APP_STORE_URL = "https://apps.apple.com/app/id6751057062";
 
-const Hero = () => {
-  const scrollToSection = (sectionId: string) => {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-    }
+export default function Hero() {
+  const scrollTo = (id: string) => {
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: "smooth" });
   };
 
   return (
-    <section id="hero" className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      {/* Background Image */}
-      <div 
+    <section className="relative min-h-screen flex items-end overflow-hidden">
+      {/* Hero photo — place your image at /public/hero-collegiate.jpg */}
+      <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: `url(${heroImage})` }}
-      >
-        <div className="absolute inset-0 bg-royal-blue/80 backdrop-blur-sm"></div>
-      </div>
+        style={{ backgroundImage: "url('/hero-collegiate.jpg')" }}
+        aria-hidden="true"
+      />
+
+      {/* Blue overlay */}
+      <div className="absolute inset-0 bg-[#1740A6]/55" aria-hidden="true" />
+
+      {/* Film grain */}
+      <div className="grain-overlay absolute inset-0 pointer-events-none" aria-hidden="true" />
 
       {/* Content */}
-      <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center animate-fade-in">
-        <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold text-white mb-6 leading-tight">
-          Student Rides.
+      <div className="relative z-10 mx-auto w-full max-w-6xl px-5 sm:px-8 pb-20 sm:pb-28 pt-32">
+        <h1 className="text-[clamp(3.25rem,9.5vw,8rem)] font-bold leading-[0.92] tracking-tight text-white">
+          Your campus.
           <br />
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-royal-blue-light">
-            Safer. Smarter.
-          </span>
+          Your ride.
         </h1>
-        
-        <p className="text-xl md:text-2xl text-white/90 mb-10 max-w-3xl mx-auto font-medium leading-relaxed">
-          Your trusted community for secure and reliable student transportation. 
-          Built by students, for students.
+
+        <p className="mt-7 max-w-lg text-lg sm:text-xl text-white/85 font-normal leading-relaxed">
+          Student rideshare at the University of South Carolina. Verified
+          drivers, upfront fares, and a pickup code so you always get in the
+          right car.
         </p>
 
-        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-          <Button 
-            variant="hero" 
-            size="lg"
-            onClick={() => scrollToSection('join')}
-            className="px-8 py-4 text-xl"
+        <div className="mt-10 flex flex-wrap gap-4 items-center">
+          <a
+            href={APP_STORE_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 rounded-full bg-white px-7 py-3.5 text-sm font-bold text-[#1740A6] hover:bg-white/90 transition-colors"
           >
-            Join the Waitlist
-            <ArrowRight className="ml-2 h-5 w-5" />
-          </Button>
-          
-          <Button 
-            variant="royal-outline" 
-            size="lg"
-            onClick={() => scrollToSection('features')}
-            className="px-8 py-4 text-xl bg-white/10 backdrop-blur-sm border-white/50 text-white hover:bg-white hover:text-royal-blue"
+            Get the app
+          </a>
+          <button
+            onClick={() => scrollTo("how-it-works")}
+            className="inline-flex items-center gap-2 rounded-full border border-white/50 bg-transparent px-7 py-3.5 text-sm font-semibold text-white hover:bg-white/10 transition-colors cursor-pointer"
           >
-            Learn More
-          </Button>
-          
-          <Button 
-            variant="royal-outline" 
-            size="lg"
-            asChild
-            className="px-8 py-4 text-xl bg-white/10 backdrop-blur-sm border-white/50 text-white hover:bg-white hover:text-royal-blue w-full sm:w-auto"
-          >
-            <a 
-              href="https://saferides-73eb2.web.app/promo" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center"
-            >
-              <Smartphone className="mr-2 h-5 w-5" />
-              Download Apps
-            </a>
-          </Button>
+            How it works
+          </button>
         </div>
 
-        {/* Trust Indicators */}
-        <div className="mt-16 flex flex-col items-center">
-          <p className="text-white/70 text-sm mb-4">Trusted by students at</p>
-          <div className="flex flex-wrap gap-8 items-center justify-center text-white/60 text-sm font-medium">
-            <span>University of South Carolina</span>
-            <span>•</span>
-            <span>And more universities coming soon</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Scroll Indicator */}
-      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
-        <div className="w-6 h-10 border-2 border-white/50 rounded-full flex justify-center">
-          <div className="w-1 h-3 bg-white/70 rounded-full mt-2"></div>
-        </div>
+        <p className="mt-14 text-white/50 text-xs font-medium tracking-widest uppercase">
+          Now at the University of South Carolina
+        </p>
       </div>
     </section>
   );
-};
-
-export default Hero;
+}
