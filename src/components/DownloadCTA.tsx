@@ -30,14 +30,12 @@ export default function DownloadCTA() {
           Download on the App Store
         </a>
 
-        {/* Phone mockup placeholder — swap in a real screenshot at this size */}
-        <div className="mt-16 w-full max-w-xs rounded-[2.5rem] bg-[#F3F5FC] border border-[#E4EAF8] h-[30rem] flex items-center justify-center">
-          <p className="text-[#0D1B4B]/30 text-xs font-medium text-center px-6 leading-relaxed">
-            [Phone mockup]
-            <br />
-            Drop in a real app screenshot
-          </p>
-        </div>
+        <img
+          src="/phone-mockup.png"
+          alt="Saferides app"
+          className="mt-16 w-full max-w-xs rounded-[2.5rem] object-contain"
+          loading="lazy"
+        />
       </div>
     </section>
   );

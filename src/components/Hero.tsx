@@ -11,7 +11,7 @@ export default function Hero() {
       {/* Hero photo — place your image at /public/hero-collegiate.jpg */}
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: "url('/hero-collegiate.jpg')" }}
+        style={{ backgroundImage: "url('/hero-collegiate.png')" }}
         aria-hidden="true"
       />
 
