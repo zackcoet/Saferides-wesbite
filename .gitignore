@@ -11,6 +11,11 @@ node_modules
 dist-ssr
 *.local
 
+# Local environment files — never commit real secrets, only .env.example
+.env
+.env.*
+!.env.example
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

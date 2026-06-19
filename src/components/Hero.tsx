@@ -8,7 +8,7 @@ export default function Hero() {
 
   return (
     <section className="relative min-h-screen flex items-end overflow-hidden">
-      {/* Hero photo — place your image at /public/hero-collegiate.jpg */}
+      {/* Hero photo */}
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{ backgroundImage: "url('/hero-collegiate.png')" }}
@@ -23,16 +23,17 @@ export default function Hero() {
 
       {/* Content */}
       <div className="relative z-10 mx-auto w-full max-w-6xl px-5 sm:px-8 pb-20 sm:pb-28 pt-32">
+        <p className="mb-6 text-white/50 text-xs font-medium tracking-widest uppercase">
+          Now at the University of South Carolina
+        </p>
+
         <h1 className="text-[clamp(3.25rem,9.5vw,8rem)] font-bold leading-[0.92] tracking-tight text-white">
-          Your campus.
-          <br />
-          Your ride.
+          The safer ride home.
         </h1>
 
         <p className="mt-7 max-w-lg text-lg sm:text-xl text-white/85 font-normal leading-relaxed">
-          Student rideshare at the University of South Carolina. Verified
-          drivers, upfront fares, and a pickup code so you always get in the
-          right car.
+          SafeRides is a student-only rideshare platform. Every driver is a
+          verified student at your university. Available at USC Columbia.
         </p>
 
         <div className="mt-10 flex flex-wrap gap-4 items-center">
@@ -51,10 +52,6 @@ export default function Hero() {
             How it works
           </button>
         </div>
-
-        <p className="mt-14 text-white/50 text-xs font-medium tracking-widest uppercase">
-          Now at the University of South Carolina
-        </p>
       </div>
     </section>
   );

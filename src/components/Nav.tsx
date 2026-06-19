@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 
 const NAV_LINKS = [
-  { label: "How it works", href: "#how-it-works" },
-  { label: "Features", href: "#features" },
+  { label: "Ride", href: "#how-it-works" },
   { label: "Drive", href: "#drive" },
 ];
 
@@ -29,7 +29,7 @@ export default function Nav() {
   return (
     <header
       className={`fixed inset-x-0 top-0 z-50 bg-white transition-all duration-300 ${
-        scrolled ? "shadow-[0_1px_0_0_#e5e7eb]" : ""
+        scrolled ? "shadow-[0_1px_0_0_rgba(23,64,166,0.12)]" : ""
       }`}
     >
       <div className="mx-auto max-w-6xl px-5 sm:px-8 flex h-16 items-center justify-between">
@@ -45,16 +45,22 @@ export default function Nav() {
             <button
               key={l.href}
               onClick={() => handleNavClick(l.href)}
-              className="text-sm font-medium text-[#0D1B4B] hover:text-[#1740A6] transition-colors bg-transparent border-none cursor-pointer"
+              className="text-sm font-medium text-[#1740A6]/80 hover:text-[#1740A6] transition-colors bg-transparent border-none cursor-pointer"
             >
               {l.label}
             </button>
           ))}
+          <Link
+            to="/apply"
+            className="text-sm font-medium text-[#1740A6]/80 hover:text-[#1740A6] transition-colors"
+          >
+            Apply
+          </Link>
           <a
             href={APP_STORE_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="ml-1 rounded-full bg-[#1740A6] px-5 py-2 text-sm font-semibold text-white hover:bg-[#0F2F8C] transition-colors"
+            className="ml-1 rounded-full bg-[#1740A6] px-5 py-2 text-sm font-semibold text-white hover:bg-[#1740A6]/90 transition-colors"
           >
             Get the app
           </a>
@@ -63,7 +69,7 @@ export default function Nav() {
         <button
           aria-label={open ? "Close menu" : "Open menu"}
           onClick={() => setOpen((v) => !v)}
-          className="md:hidden p-2 text-[#0D1B4B]"
+          className="md:hidden p-2 text-[#1740A6]"
         >
           {open ? (
             <svg
@@ -106,11 +112,18 @@ export default function Nav() {
             <button
               key={l.href}
               onClick={() => handleNavClick(l.href)}
-              className="text-left text-base font-medium text-[#0D1B4B] hover:text-[#1740A6] bg-transparent border-none cursor-pointer"
+              className="text-left text-base font-medium text-[#1740A6]/80 hover:text-[#1740A6] bg-transparent border-none cursor-pointer"
             >
               {l.label}
             </button>
           ))}
+          <Link
+            to="/apply"
+            onClick={() => setOpen(false)}
+            className="text-base font-medium text-[#1740A6]/80 hover:text-[#1740A6]"
+          >
+            Apply
+          </Link>
           <a
             href={APP_STORE_URL}
             target="_blank"

@@ -1,10 +1,47 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { signInAnonymously } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
+import { auth, db } from "@/lib/firebase";
+
+type LegalContentState = {
+  content: string;
+  loading: boolean;
+};
+
+async function loadLegalField(fieldName: "termsContent" | "privacyContent") {
+  await signInAnonymously(auth);
+  const snap = await getDoc(doc(db, "legal", "terms"));
+  const content = snap.exists() ? snap.data()[fieldName] : "";
+  return typeof content === "string" ? content.trim() : "";
+}
 
 const Terms = () => {
+  const [legalContent, setLegalContent] = useState<LegalContentState>({
+    content: "",
+    loading: true,
+  });
+
   useEffect(() => {
     document.title = "Terms of Service - Saferides";
+
+    let cancelled = false;
+
+    async function loadTerms() {
+      try {
+        const content = await loadLegalField("termsContent");
+        if (!cancelled) setLegalContent({ content, loading: false });
+      } catch (error) {
+        console.error("Failed to load Terms from Firestore:", error);
+        if (!cancelled) setLegalContent({ content: "", loading: false });
+      }
+    }
+
+    void loadTerms();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   return (
@@ -16,6 +53,18 @@ const Terms = () => {
             <h1 className="text-2xl font-bold text-gray-900">SafeRides™ Terms of Service</h1>
           </header>
           <div className="space-y-6 text-sm leading-relaxed">
+            {legalContent.loading ? (
+              <div className="py-12 text-center text-gray-700">Loading...</div>
+            ) : legalContent.content ? (
+              legalContent.content.startsWith("<") ? (
+                <div dangerouslySetInnerHTML={{ __html: legalContent.content }} />
+              ) : (
+                <p className="text-gray-700" style={{ whiteSpace: "pre-wrap" }}>
+                  {legalContent.content}
+                </p>
+              )
+            ) : (
+              <>
             <p className="text-gray-700"><strong>IMPORTANT: PLEASE BE ADVISED THAT BY AGREEING TO THESE TERMS YOU ARE WAIVING YOUR RIGHT TO SEEK RELIEF IN A COURT OF LAW AND WAIVING YOUR RIGHT TO HAVE A JURY TRIAL ON YOUR CLAIMS.</strong></p>
             <p className="text-gray-700" style={{ fontSize: "0.85em", lineHeight: 1.6 }}>PLEASE READ THESE TERMS OF SERVICE CAREFULLY AS THEY CONTAIN PROVISIONS THAT GOVERN HOW YOU CAN BRING CLAIMS BETWEEN YOU AND SAFERIDES™, INCLUDING THE ARBITRATION AGREEMENT IN SECTION 2 BELOW. THE ARBITRATION AGREEMENT REQUIRES YOU TO RESOLVE ALL DISPUTES WITH SAFERIDES™ ON AN INDIVIDUAL BASIS AND, WITH LIMITED EXCEPTIONS, THROUGH FINAL AND BINDING ARBITRATION. THESE TERMS OF SERVICE OUTLINE HOW SUCH CLAIMS ARE RESOLVED, INCLUDING, WITHOUT LIMITATION, ANY CLAIMS THAT AROSE OR WERE ASSERTED BEFORE THE EFFECTIVE DATE OF THESE TERMS OF SERVICE. BY AGREEING TO THESE TERMS OF SERVICE, YOU EXPRESSLY ACKNOWLEDGE THAT YOU HAVE READ AND UNDERSTOOD ALL OF THEM AND HAVE TAKEN TIME TO CONSIDER THE CONSEQUENCES OF THIS IMPORTANT DECISION.</p>
             <p className="text-gray-700">These Terms of Service (“Terms of Service”) constitute a legally binding agreement between you and SafeRides™ Technologies, Inc. and its subsidiaries, representatives, affiliates, officers and directors (collectively, “SafeRides™”) governing your use of SafeRides™’ personalized, multipurpose, digital marketplace platform (“SafeRides™ Marketplace Platform”) and any related content or services, including but not limited to mobile and/or web-based applications (“Applications” or the “SafeRides™ App,” and together with the SafeRides™ Marketplace Platform, the “Services”).</p>
@@ -170,6 +219,8 @@ const Terms = () => {
             <p className="text-gray-700">Claims of copyright and trademark infringement should be sent to SafeRides™’s designated agent. Please see SafeRides™’s Copyright Policy or Trademark Policy for the designated address and additional information.</p>
             <h3 className="text-lg font-semibold text-gray-900 mt-6 mb-2">Notice.</h3>
             <p className="text-gray-700">SafeRides™ may give notice by means of a general notice on or through the Services, electronic mail to the email address associated with your Account, telephone or text message to any phone number provided in connection with your Account, or by written communication sent by first class mail or pre-paid post to any address connected with your Account. Such notice shall be deemed to have been given upon the expiration of 48 hours after mailing or posting (if sent by first class mail or pre-paid post) or at the time of sending (if sent by email, telephone, or on or through the Services). Notwithstanding the foregoing, notice of any modifications</p>
+              </>
+            )}
           </div>
         </div>
       </main>

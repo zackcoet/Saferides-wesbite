@@ -1,4 +1,4 @@
-const APP_STORE_URL = "https://apps.apple.com/app/id6751057062";
+const APP_STORE_URL = "https://apps.apple.com/app/id6750380495";
 
 function AppleIcon() {
   return (
@@ -14,17 +14,21 @@ function AppleIcon() {
 
 export default function DownloadCTA() {
   return (
-    <section className="bg-white py-24 sm:py-32 border-t border-[#E4EAF8]">
+    <section className="bg-white py-24 sm:py-32 border-t border-[#1740A6]/10">
       <div className="mx-auto max-w-6xl px-5 sm:px-8 flex flex-col items-center text-center">
-        <h2 className="text-[clamp(2.75rem,7vw,6.5rem)] font-bold text-[#0D1B4B] leading-[0.95] tracking-tight mb-10">
-          Get Saferides.
+        <h2 className="text-[clamp(2.75rem,7vw,6.5rem)] font-bold text-[#1740A6] leading-[0.95] tracking-tight mb-5">
+          Your safer ride starts here.
         </h2>
+
+        <p className="text-lg sm:text-xl text-[#1740A6]/70 leading-relaxed mb-10">
+          Student-only. Verified drivers. Pickup code every ride.
+        </p>
 
         <a
           href={APP_STORE_URL}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-3 rounded-full bg-[#1740A6] px-8 py-4 text-white font-semibold text-base hover:bg-[#0F2F8C] transition-colors"
+          className="inline-flex items-center gap-3 rounded-full bg-[#1740A6] px-8 py-4 text-white font-semibold text-base hover:bg-[#1740A6]/90 transition-colors"
         >
           <AppleIcon />
           Download on the App Store

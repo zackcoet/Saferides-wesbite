@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width,initial-scale=1" />
+	<title>Pay your SafeRides split</title>
+	<meta name="description" content="Open SafeRides to pay your share of the trip." />
+	<meta name="apple-itunes-app" content="app-id=6751057062" />
+	<style>
+		* { box-sizing: border-box; }
+		html, body { margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #F5F7FB; color: #111; }
+		.wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
+		.card {
+			max-width: 420px; width: 100%; background: #fff; border-radius: 20px; padding: 32px 24px;
+			text-align: center; box-shadow: 0 10px 40px rgba(23, 78, 166, 0.12);
+		}
+		.logo { width: 64px; height: 64px; border-radius: 16px; background: #174EA6; margin: 0 auto 16px; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 800; font-size: 24px; letter-spacing: 0.5px; }
+		h1 { font-size: 22px; margin: 0 0 8px; }
+		p { font-size: 14px; line-height: 21px; color: #4B5563; margin: 0 0 22px; }
+		.btn { display: inline-block; width: 100%; padding: 14px 18px; border-radius: 12px; text-decoration: none; font-weight: 700; font-size: 15px; margin-bottom: 10px; }
+		.btn-primary { background: #174EA6; color: #fff; }
+		.btn-secondary { background: #EEF4FF; color: #174EA6; }
+		.small { font-size: 12px; color: #6B7280; margin-top: 12px; }
+	</style>
+</head>
+<body>
+	<div class="wrap">
+		<div class="card">
+			<div class="logo">SR</div>
+			<h1>Pay your SafeRides split</h1>
+			<p>This link opens the SafeRides app so you can pay your share with Apple Pay, Google Pay, or a saved card.</p>
+			<a id="openApp" class="btn btn-primary" href="#">Open SafeRides</a>
+			<a id="appStore" class="btn btn-secondary" href="https://apps.apple.com/app/id6751057062" target="_blank" rel="noopener">Get the app</a>
+			<p class="small">If the app didn't open automatically, tap "Open SafeRides" above.</p>
+		</div>
+	</div>
+	<script>
+		(function() {
+			// Path is /pay/<token>/ — strip trailing slash if hosting serves index.html for directories
+			var parts = window.location.pathname.split('/').filter(Boolean);
+			var token = parts[parts.length - 1] || '';
+			var deeplink = 'saferides://pay/' + encodeURIComponent(token);
+			var openBtn = document.getElementById('openApp');
+			openBtn.href = deeplink;
+
+			// Try to launch the app immediately on iOS/Android (Universal Links should
+			// already have caught it; this is a fallback for older OS versions / chrome.)
+			setTimeout(function() {
+				window.location.href = deeplink;
+			}, 250);
+		})();
+	</script>
+</body>
+</html>

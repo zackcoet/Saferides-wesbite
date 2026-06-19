@@ -3,31 +3,27 @@ import { useState } from "react";
 const FAQS = [
   {
     q: "What is SafeRides?",
-    a: "SafeRides is a student rideshare platform built for college campuses. Every driver is a verified student, every fare is upfront, and every ride uses a pickup code so you always get in the right car.",
+    a: "SafeRides is a student-only rideshare platform built for college campuses. Every driver is a verified student at your university. Every fare is shown upfront. Every ride uses a pickup code so you always get in the right car.",
   },
   {
     q: "How are drivers verified?",
-    a: "Drivers go through a review process before they can accept rides. You will always be able to see your driver's name and car before they arrive.",
+    a: "Every driver goes through a review and approval process before they can accept a single ride. You will always see your driver's name, photo, and car before they arrive.",
   },
   {
-    q: "What is a pickup code?",
-    a: "Every ride generates a unique code. When your driver arrives, you share the code with them. If it does not match, you do not get in. It is one of the simplest ways to make sure you are in the right car.",
+    q: "What is the pickup code?",
+    a: "When you book a ride a unique code is generated. When your driver arrives you share the code with them. If it matches, you get in. If it does not match, you do not get in. It is the simplest way to make sure you are always in the right car.",
   },
   {
-    q: "What campuses is SafeRides available on?",
-    a: "SafeRides launched at the University of South Carolina in Columbia, SC. We are expanding to more campuses soon.",
+    q: "How much does SafeRides cost?",
+    a: "Fares are shown upfront before you book. There are no platform fees, no surge pricing, and no hidden charges. What you see is what you pay.",
   },
   {
-    q: "Is SafeRides on Android?",
-    a: "Currently iOS only. Android is on the roadmap.",
+    q: "What campuses is SafeRides on?",
+    a: "SafeRides is live at the University of South Carolina in Columbia, SC. We are launching at Clemson, UGA, and University of Tennessee in Fall 2025.",
   },
   {
     q: "How do I become a driver?",
-    a: 'Tap "Become a driver" in the app or visit the Drive section on this site to apply.',
-  },
-  {
-    q: "What does SafeRides cost?",
-    a: "Fares are shown upfront before you book — no surprise charges.",
+    a: "Tap Drive in the app or hit Become a Driver on this page to apply. You set your own hours and keep 100% of every fare.",
   },
 ];
 
@@ -74,13 +70,13 @@ export default function FAQ() {
   const [open, setOpen] = useState<number | null>(null);
 
   return (
-    <section id="faq" className="bg-[#F3F5FC] py-24 sm:py-32">
+    <section id="faq" className="bg-[#1740A6]/5 py-24 sm:py-32">
       <div className="mx-auto max-w-6xl px-5 sm:px-8">
-        <h2 className="text-4xl sm:text-5xl font-bold text-[#0D1B4B] mb-14 sm:mb-16">
+        <h2 className="text-4xl sm:text-5xl font-bold text-[#1740A6] mb-14 sm:mb-16">
           Questions.
         </h2>
 
-        <div className="flex flex-col divide-y divide-[#E4EAF8]">
+        <div className="flex flex-col divide-y divide-[#1740A6]/10">
           {FAQS.map((item, i) => (
             <div key={i}>
               <button
@@ -88,7 +84,7 @@ export default function FAQ() {
                 className="w-full flex items-center justify-between py-5 text-left gap-6 group cursor-pointer"
                 aria-expanded={open === i}
               >
-                <span className="text-base sm:text-lg font-semibold text-[#1740A6] group-hover:text-[#0F2F8C] transition-colors">
+                <span className="text-base sm:text-lg font-semibold text-[#1740A6] group-hover:text-[#1740A6]/70 transition-colors">
                   {item.q}
                 </span>
                 <span className="flex-shrink-0 text-[#1740A6]">
@@ -98,7 +94,7 @@ export default function FAQ() {
 
               {open === i && (
                 <div className="pb-6">
-                  <p className="text-[#0D1B4B]/65 leading-relaxed">{item.a}</p>
+                  <p className="text-[#1740A6]/70 leading-relaxed">{item.a}</p>
                 </div>
               )}
             </div>
