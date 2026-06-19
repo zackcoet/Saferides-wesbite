@@ -1,11 +1,14 @@
 import { lazy, Suspense } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
-import Privacy from "./pages/Privacy";
-import Terms from "./pages/Terms";
 import StoryPage from "./pages/StoryPage";
 import NotFound from "./pages/NotFound";
 
+// Privacy, Terms, and Apply import the Firebase SDK, which initializes at
+// module load. Lazy-load them so Firebase is never pulled into the main bundle
+// and the landing page renders even when Firebase env vars are absent.
+const Privacy = lazy(() => import("./pages/Privacy"));
+const Terms = lazy(() => import("./pages/Terms"));
 const Apply = lazy(() => import("./pages/Apply"));
 
 export default function App() {
