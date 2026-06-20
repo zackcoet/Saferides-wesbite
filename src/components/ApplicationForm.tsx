@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useForm, Controller } from "react-hook-form";
+import { useForm, Controller, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { signInAnonymously } from "firebase/auth";
@@ -21,6 +21,9 @@ import { auth, db, storage } from "@/lib/firebase";
 const MAX_RESUME_BYTES = 5 * 1024 * 1024; // 5MB
 const PDF_MIME = "application/pdf";
 
+// Roles for which a portfolio / previous-work link is relevant.
+const PORTFOLIO_ROLES = ["Motion Designer", "Marketing Manager"];
+
 const applicationSchema = z.object({
   firstName: z.string().trim().min(1, "First name is required"),
   lastName: z.string().trim().min(1, "Last name is required"),
@@ -36,12 +39,14 @@ const applicationSchema = z.object({
       (value) => value.toLowerCase().endsWith(".edu"),
       "Email must be a .edu address",
     ),
+  phone: z.string().trim().min(1, "Phone number is required"),
   role: z.enum(
     ["Campus Representative", "Intern", "Marketing Manager", "Motion Designer"],
     {
       required_error: "Please select a role",
     },
   ),
+  portfolioLink: z.string().trim().optional(),
   resume: z
     .custom<FileList>(
       (value) => value instanceof FileList && value.length > 0,
@@ -77,8 +82,14 @@ export default function ApplicationForm() {
       lastName: "",
       school: "",
       email: "",
+      phone: "",
+      portfolioLink: "",
     },
   });
+
+  // Show the portfolio field only for Motion Designer / Marketing Manager.
+  const selectedRole = useWatch({ control, name: "role" });
+  const showPortfolio = PORTFOLIO_ROLES.includes(selectedRole as string);
 
   const onSubmit = async (values: ApplicationValues) => {
     setStatus("submitting");
@@ -91,28 +102,37 @@ export default function ApplicationForm() {
       return;
     }
 
+    const name = `${values.firstName} ${values.lastName}`.trim();
+    const portfolioLink =
+      showPortfolio && values.portfolioLink && values.portfolioLink.trim()
+        ? values.portfolioLink.trim()
+        : null;
+
     try {
       // Anonymous auth matches the rest of the site's Firebase access pattern.
       await signInAnonymously(auth);
 
       const timestamp = Date.now();
-      const path = `applications/${timestamp}_${values.lastName}_${values.firstName}.pdf`;
+      const safeName = name.replace(/[^a-zA-Z0-9]+/g, "_") || "applicant";
+      const resumeStoragePath = `applications/${timestamp}_${safeName}.pdf`;
 
       // Storage upload must complete before we write to Firestore. If the upload
       // throws, we fall through to catch and never create the Firestore record.
-      const storageRef = ref(storage, path);
+      const storageRef = ref(storage, resumeStoragePath);
       await uploadBytes(storageRef, file, { contentType: PDF_MIME });
       const resumeUrl = await getDownloadURL(storageRef);
 
-      await addDoc(collection(db, "applications"), {
-        firstName: values.firstName,
-        lastName: values.lastName,
-        school: values.school,
+      await addDoc(collection(db, "jobApplications"), {
+        name,
         email: values.email,
+        phone: values.phone,
         role: values.role,
+        portfolioLink,
         resumeUrl,
-        submittedAt: serverTimestamp(),
+        resumeStoragePath,
+        school: values.school,
         status: "pending",
+        submittedAt: serverTimestamp(),
       });
 
       setStatus("success");
@@ -127,8 +147,8 @@ export default function ApplicationForm() {
   if (status === "success") {
     return (
       <div className="rounded-2xl border border-[#1740A6]/15 bg-white p-8 sm:p-10 text-center">
-        <p className="text-lg font-semibold text-[#1740A6]">
-          Application received. We will be in touch soon.
+        <p className="font-display font-bold text-lg text-[#1740A6]">
+          Application received. We will be in touch.
         </p>
       </div>
     );
@@ -215,6 +235,25 @@ export default function ApplicationForm() {
       </div>
 
       <div className="space-y-2">
+        <Label htmlFor="phone" className="text-[#1740A6]">
+          Phone Number
+        </Label>
+        <Input
+          id="phone"
+          type="tel"
+          autoComplete="tel"
+          placeholder="Your phone number"
+          disabled={isSubmitting}
+          {...register("phone")}
+        />
+        {errors.phone && (
+          <p className="text-sm font-medium text-[#1740A6]">
+            {errors.phone.message}
+          </p>
+        )}
+      </div>
+
+      <div className="space-y-2">
         <Label htmlFor="role" className="text-[#1740A6]">
           Role applying for
         </Label>
@@ -252,9 +291,24 @@ export default function ApplicationForm() {
         )}
       </div>
 
+      {showPortfolio && (
+        <div className="space-y-2">
+          <Label htmlFor="portfolioLink" className="text-[#1740A6]">
+            Portfolio or previous work link (optional)
+          </Label>
+          <Input
+            id="portfolioLink"
+            type="url"
+            placeholder="https://"
+            disabled={isSubmitting}
+            {...register("portfolioLink")}
+          />
+        </div>
+      )}
+
       <div className="space-y-2">
         <Label htmlFor="resume" className="text-[#1740A6]">
-          Resume (PDF, max 5MB)
+          Upload your resume (PDF)
         </Label>
         <Input
           id="resume"
@@ -271,12 +325,6 @@ export default function ApplicationForm() {
         )}
       </div>
 
-      {status === "error" && (
-        <p className="text-sm font-medium text-[#1740A6]">
-          Something went wrong submitting your application. Please try again.
-        </p>
-      )}
-
       <Button
         type="submit"
         disabled={isSubmitting}
@@ -284,6 +332,12 @@ export default function ApplicationForm() {
       >
         {isSubmitting ? "Submitting..." : "Submit Application"}
       </Button>
+
+      {status === "error" && (
+        <p className="text-sm font-medium text-[#1740A6]">
+          Something went wrong submitting your application. Please try again.
+        </p>
+      )}
     </form>
   );
 }

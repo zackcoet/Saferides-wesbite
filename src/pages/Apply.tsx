@@ -9,6 +9,7 @@ type Role = {
   description: string;
   responsibilities?: string[];
   requirements?: string[];
+  niceToHave?: string[];
   compensation?: string;
 };
 
@@ -72,9 +73,24 @@ const ROLES: Role[] = [
   },
   {
     title: "Motion Designer",
-    badge: "Part Time | Remote | Portfolio Based",
+    badge: "Part Time | $15-25/hr",
     description:
-      "SafeRides is looking for a student motion designer to create short-form video content, animations, and marketing visuals for social media. You will design and animate content that shows what SafeRides looks like on campus — reels, ads, motion graphics, and anything that stops a scroll. Ideal candidate knows After Effects, Premiere, or CapCut, has a portfolio or examples to share, and understands what performs on TikTok and Instagram. No formal experience required — show us your work.",
+      "SafeRides is looking for a motion designer to create short-form video content, animations, and marketing visuals for social media. You will design and animate content that shows what SafeRides looks like on campus — reels, ads, motion graphics, and anything that stops a scroll.",
+    requirements: [
+      "Portfolio or examples of past motion work (class projects, personal work, or client work all count)",
+      "Proficiency in at least one: After Effects, Premiere Pro, CapCut, or DaVinci Resolve",
+      "Comfortable creating vertical short-form content for Reels and TikTok",
+      "Able to work 5-15 hours per week on a flexible schedule",
+      "Strong eye for pacing, transitions, and on-screen text",
+      "Familiarity with social media trends and what performs organically",
+      "Able to take creative direction and iterate quickly based on feedback",
+    ],
+    niceToHave: [
+      "Experience with motion graphics or animated typography",
+      "Familiar with brand guidelines",
+      "Has run or grown a personal social account",
+    ],
+    compensation: "$15-25/hr",
   },
 ];
 
@@ -146,6 +162,24 @@ export default function Apply() {
                       </h3>
                       <ul className="mt-3 flex list-disc flex-col gap-2 pl-5 marker:text-[#1740A6]">
                         {role.requirements.map((item) => (
+                          <li
+                            key={item}
+                            className="text-[#1740A6]/70 leading-relaxed"
+                          >
+                            {item}
+                          </li>
+                        ))}
+                      </ul>
+                    </>
+                  )}
+
+                  {role.niceToHave && (
+                    <>
+                      <h3 className="mt-7 text-sm font-bold uppercase tracking-wide text-[#1740A6]">
+                        Nice to have
+                      </h3>
+                      <ul className="mt-3 flex list-disc flex-col gap-2 pl-5 marker:text-[#1740A6]">
+                        {role.niceToHave.map((item) => (
                           <li
                             key={item}
                             className="text-[#1740A6]/70 leading-relaxed"
