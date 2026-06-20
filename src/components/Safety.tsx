@@ -28,8 +28,8 @@ const CARDS = [
     body: "Rides are confined to your campus zone. SafeRides does not take you across town — it gets you home safely within your world.",
   },
   {
-    title: "You can actually look them up",
-    body: "Your driver is a fellow student at your school. Same campus, same classes, same community. Not a stranger — a peer.",
+    title: "Request by username",
+    body: "Know a student driver you trust? Request them directly by their SafeRides username. You are never forced to ride with a stranger when you have a better option.",
   },
 ];
 
@@ -59,7 +59,11 @@ export default function Safety() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.3 }}
               transition={{ duration: 0.45, delay: (i % 2) * 0.1, ease: "easeOut" }}
-              className="rounded-2xl border border-[#1740A614] bg-white"
+              className={`rounded-2xl border border-[#1740A614] bg-white${
+                i === CARDS.length - 1
+                  ? " sm:col-span-2 sm:mx-auto sm:w-full sm:max-w-[calc(50%-10px)]"
+                  : ""
+              }`}
               style={{ padding: "28px" }}
             >
               <h3

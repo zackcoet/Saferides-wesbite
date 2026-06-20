@@ -3,7 +3,16 @@ import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import ApplicationForm from "@/components/ApplicationForm";
 
-const ROLES = [
+type Role = {
+  title: string;
+  badge: string;
+  description: string;
+  responsibilities?: string[];
+  requirements?: string[];
+  compensation?: string;
+};
+
+const ROLES: Role[] = [
   {
     title: "Campus Representative",
     badge: "Part Time | Commission Based | Flexible Hours",
@@ -61,6 +70,12 @@ const ROLES = [
     ],
     compensation: "$15-25/hr based on experience | Remote or In Person",
   },
+  {
+    title: "Motion Designer",
+    badge: "Part Time | Remote | Portfolio Based",
+    description:
+      "SafeRides is looking for a student motion designer to create short-form video content, animations, and marketing visuals for social media. You will design and animate content that shows what SafeRides looks like on campus — reels, ads, motion graphics, and anything that stops a scroll. Ideal candidate knows After Effects, Premiere, or CapCut, has a portfolio or examples to share, and understands what performs on TikTok and Instagram. No formal experience required — show us your work.",
+  },
 ];
 
 export default function Apply() {
@@ -106,42 +121,52 @@ export default function Apply() {
                     {role.description}
                   </p>
 
-                  <h3 className="mt-7 text-sm font-bold uppercase tracking-wide text-[#1740A6]">
-                    Responsibilities
-                  </h3>
-                  <ul className="mt-3 flex list-disc flex-col gap-2 pl-5 marker:text-[#1740A6]">
-                    {role.responsibilities.map((item) => (
-                      <li
-                        key={item}
-                        className="text-[#1740A6]/70 leading-relaxed"
-                      >
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
+                  {role.responsibilities && (
+                    <>
+                      <h3 className="mt-7 text-sm font-bold uppercase tracking-wide text-[#1740A6]">
+                        Responsibilities
+                      </h3>
+                      <ul className="mt-3 flex list-disc flex-col gap-2 pl-5 marker:text-[#1740A6]">
+                        {role.responsibilities.map((item) => (
+                          <li
+                            key={item}
+                            className="text-[#1740A6]/70 leading-relaxed"
+                          >
+                            {item}
+                          </li>
+                        ))}
+                      </ul>
+                    </>
+                  )}
 
-                  <h3 className="mt-7 text-sm font-bold uppercase tracking-wide text-[#1740A6]">
-                    Requirements
-                  </h3>
-                  <ul className="mt-3 flex list-disc flex-col gap-2 pl-5 marker:text-[#1740A6]">
-                    {role.requirements.map((item) => (
-                      <li
-                        key={item}
-                        className="text-[#1740A6]/70 leading-relaxed"
-                      >
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
+                  {role.requirements && (
+                    <>
+                      <h3 className="mt-7 text-sm font-bold uppercase tracking-wide text-[#1740A6]">
+                        Requirements
+                      </h3>
+                      <ul className="mt-3 flex list-disc flex-col gap-2 pl-5 marker:text-[#1740A6]">
+                        {role.requirements.map((item) => (
+                          <li
+                            key={item}
+                            className="text-[#1740A6]/70 leading-relaxed"
+                          >
+                            {item}
+                          </li>
+                        ))}
+                      </ul>
+                    </>
+                  )}
 
-                  <div className="mt-7 rounded-xl bg-[#1740A6]/5 px-5 py-4">
-                    <span className="text-sm font-bold uppercase tracking-wide text-[#1740A6]">
-                      Compensation
-                    </span>
-                    <p className="mt-1 font-medium text-[#1740A6] leading-relaxed">
-                      {role.compensation}
-                    </p>
-                  </div>
+                  {role.compensation && (
+                    <div className="mt-7 rounded-xl bg-[#1740A6]/5 px-5 py-4">
+                      <span className="text-sm font-bold uppercase tracking-wide text-[#1740A6]">
+                        Compensation
+                      </span>
+                      <p className="mt-1 font-medium text-[#1740A6] leading-relaxed">
+                        {role.compensation}
+                      </p>
+                    </div>
+                  )}
                 </article>
               ))}
             </div>

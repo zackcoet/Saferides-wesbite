@@ -36,9 +36,12 @@ const applicationSchema = z.object({
       (value) => value.toLowerCase().endsWith(".edu"),
       "Email must be a .edu address",
     ),
-  role: z.enum(["Campus Representative", "Intern", "Marketing Manager"], {
-    required_error: "Please select a role",
-  }),
+  role: z.enum(
+    ["Campus Representative", "Intern", "Marketing Manager", "Motion Designer"],
+    {
+      required_error: "Please select a role",
+    },
+  ),
   resume: z
     .custom<FileList>(
       (value) => value instanceof FileList && value.length > 0,
@@ -234,6 +237,9 @@ export default function ApplicationForm() {
                 <SelectItem value="Intern">Intern</SelectItem>
                 <SelectItem value="Marketing Manager">
                   Marketing Manager
+                </SelectItem>
+                <SelectItem value="Motion Designer">
+                  Motion Designer
                 </SelectItem>
               </SelectContent>
             </Select>
