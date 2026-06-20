@@ -12,10 +12,10 @@ export default function NotFound() {
     <div className="flex min-h-screen items-center justify-center bg-white">
       <div className="text-center">
         <p className="text-8xl font-bold text-[#1740A6]">404</p>
-        <p className="mt-4 text-lg text-[#0D1B4B]/60">Page not found</p>
+        <p className="mt-4 text-lg text-[#1740A6]/60">Page not found</p>
         <a
           href="/"
-          className="mt-8 inline-block rounded-full bg-[#1740A6] px-6 py-3 text-sm font-semibold text-white hover:bg-[#0F2F8C] transition-colors"
+          className="mt-8 inline-block rounded-full bg-[#1740A6] px-6 py-3 text-sm font-semibold text-white hover:bg-[#1740A6]/90 transition-colors"
         >
           Back to home
         </a>

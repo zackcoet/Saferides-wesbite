@@ -1,49 +1,73 @@
 import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
 
 const ROLES = [
   {
     title: "Campus Representative",
-    body: "Represent SafeRides at your university, grow the rider and driver community, and be the face of the platform on campus.",
+    body: "Represent SafeRides on your campus. Recruit riders and drivers, grow the community, and earn from a monthly performance pool.",
+  },
+  {
+    title: "Marketing Manager",
+    body: "Own our social media across campuses. Create short-form content and grow the SafeRides presence as we expand.",
   },
   {
     title: "Intern",
-    body: "Work directly with the founding team, gain real startup experience, and help build something students actually use.",
+    body: "Work directly with the founding team. Get hands-on startup experience building something students actually use.",
   },
 ];
 
 export default function JoinTheTeam() {
   return (
-    <section id="join-the-team" className="bg-white py-24 sm:py-32 border-t border-[#1740A6]/10">
+    <section id="careers" className="bg-white py-20 sm:py-28">
       <div className="mx-auto max-w-6xl px-5 sm:px-8">
-        <h2 className="text-4xl sm:text-5xl font-bold text-[#1740A6] mb-4">
-          Join the team early.
+        <h2
+          className="font-display font-black text-[#1740A6]"
+          style={{ fontSize: "clamp(2rem, 4vw, 3rem)", lineHeight: 1.05 }}
+        >
+          Join the SafeRides team.
         </h2>
-        <p className="mt-3 text-lg text-[#1740A6]/70 max-w-2xl mb-14 leading-relaxed">
-          SafeRides is just getting started. Help us build the future of campus
-          transportation from the ground up as a campus representative or intern.
+        <p
+          className="mt-5 font-body text-[#1740A6]/65"
+          style={{ fontSize: "1.125rem", maxWidth: "560px", lineHeight: 1.6 }}
+        >
+          We are building SafeRides from the ground up and hiring students to
+          help. Get in early as a campus representative, marketing manager, or
+          intern.
         </p>
 
-        <div className="grid gap-5 sm:grid-cols-2">
-          {ROLES.map((role) => (
-            <div
+        <div className="mt-12 grid gap-5 sm:grid-cols-3">
+          {ROLES.map((role, i) => (
+            <motion.div
               key={role.title}
-              className="rounded-2xl border border-[#1740A6]/15 bg-white p-8 sm:p-10"
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.3 }}
+              transition={{ duration: 0.45, delay: i * 0.1, ease: "easeOut" }}
+              className="rounded-2xl border border-[#1740A614] bg-white"
+              style={{ padding: "28px" }}
             >
-              <div className="mb-5 h-1.5 w-8 rounded-full bg-[#1740A6]" />
-              <h3 className="text-xl font-bold text-[#1740A6] mb-2.5">
+              <h3
+                className="font-display font-bold text-[#1740A6]"
+                style={{ fontSize: "1.125rem" }}
+              >
                 {role.title}
               </h3>
-              <p className="text-[#1740A6]/70 leading-relaxed">{role.body}</p>
-            </div>
+              <p
+                className="mt-2.5 font-body text-[#1740A6]/65"
+                style={{ fontSize: "0.9375rem", lineHeight: 1.6 }}
+              >
+                {role.body}
+              </p>
+            </motion.div>
           ))}
         </div>
 
-        <div className="mt-12 flex justify-center">
+        <div className="mt-10">
           <Link
             to="/apply"
-            className="inline-block rounded-full bg-[#1740A6] px-8 py-4 text-base font-bold text-white hover:bg-[#1740A6]/90 transition-colors"
+            className="inline-block rounded-[10px] bg-[#1740A6] px-7 py-3.5 font-body font-semibold text-white"
           >
-            Apply Now
+            Apply now
           </Link>
         </div>
       </div>

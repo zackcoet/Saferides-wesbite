@@ -24,7 +24,7 @@ const Privacy = () => {
   });
 
   useEffect(() => {
-    document.title = "Privacy Policy - Saferides";
+    document.title = "Privacy Policy - SafeRides";
 
     let cancelled = false;
 

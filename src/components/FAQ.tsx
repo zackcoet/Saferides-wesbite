@@ -19,7 +19,7 @@ const FAQS = [
   },
   {
     q: "What campuses is SafeRides on?",
-    a: "SafeRides is live at the University of South Carolina in Columbia, SC. We are launching at Clemson, UGA, and University of Tennessee in Fall 2025.",
+    a: "SafeRides is live at the University of South Carolina in Columbia, SC. We are launching at Clemson, UGA, and University of Tennessee in Fall 2026.",
   },
   {
     q: "How do I become a driver?",

@@ -1,14 +1,14 @@
 import { Link } from "react-router-dom";
 
 const NAV_LINKS = [
-  { label: "Ride", href: "#how-it-works" },
-  { label: "Drive", href: "#drive" },
+  { label: "Safety", href: "#safety" },
+  { label: "How It Works", href: "#how-it-works" },
+  { label: "For Businesses", href: "#for-businesses" },
+  { label: "Drivers", href: "#drivers" },
 ];
 
-// Replace with real contact email
 const CONTACT_EMAIL = "saferideshelp@gmail.com";
-const INSTAGRAM_URL = "https://www.instagram.com/saferides";
-const TIKTOK_URL = "https://www.tiktok.com/@saferides";
+const APP_STORE_URL = "https://apps.apple.com/app/id6750380495";
 
 export default function Footer() {
   const scrollTo = (href: string) => {
@@ -19,82 +19,86 @@ export default function Footer() {
   };
 
   return (
-    <footer className="bg-white border-t border-[#1740A6]/10">
-      <div className="mx-auto max-w-6xl px-5 sm:px-8 py-12 flex flex-col gap-10 sm:flex-row sm:items-start sm:justify-between">
+    <footer className="bg-[#1740A6]">
+      <div className="mx-auto max-w-6xl px-5 sm:px-8 py-14 grid gap-10 sm:grid-cols-3">
+        {/* Brand */}
         <div className="flex flex-col gap-3">
-          <span className="text-[#1740A6] font-bold text-lg tracking-tight">
-            Saferides
+          <span
+            className="font-display font-black text-white tracking-tight"
+            style={{ fontSize: "1.5rem" }}
+          >
+            SafeRides
           </span>
-          <p className="text-[#1740A6]/55 text-sm leading-relaxed max-w-[240px]">
-            Student-only rideshare. Built for campus safety.
+          <p
+            className="font-body text-white/65"
+            style={{ fontSize: "0.9rem", maxWidth: "240px", lineHeight: 1.6 }}
+          >
+            Student-only rideshare. Built for campus.
           </p>
           <a
             href={`mailto:${CONTACT_EMAIL}`}
-            className="text-sm text-[#1740A6]/55 hover:text-[#1740A6] transition-colors"
+            className="font-body text-white/65 hover:text-white transition-colors"
+            style={{ fontSize: "0.9rem" }}
           >
             {CONTACT_EMAIL}
           </a>
         </div>
 
-        <div className="flex flex-wrap gap-12 sm:gap-16">
-          <div className="flex flex-col gap-3">
-            {NAV_LINKS.map((l) => (
-              <button
-                key={l.href}
-                onClick={() => scrollTo(l.href)}
-                className="text-left text-sm text-[#1740A6]/60 hover:text-[#1740A6] transition-colors bg-transparent border-none cursor-pointer"
-              >
-                {l.label}
-              </button>
-            ))}
-          </div>
-
-          <div className="flex flex-col gap-3">
-            <Link
-              to="/apply"
-              className="text-sm text-[#1740A6]/60 hover:text-[#1740A6] transition-colors"
+        {/* Nav */}
+        <div className="flex flex-col gap-3">
+          {NAV_LINKS.map((l) => (
+            <button
+              key={l.href}
+              onClick={() => scrollTo(l.href)}
+              className="text-left font-body font-medium text-white/65 hover:text-white transition-colors bg-transparent border-none cursor-pointer"
             >
-              Apply
-            </Link>
+              {l.label}
+            </button>
+          ))}
+          <Link
+            to="/apply"
+            className="font-body font-medium text-white/65 hover:text-white transition-colors w-fit"
+          >
+            Apply
+          </Link>
+        </div>
+
+        {/* App + legal */}
+        <div className="flex flex-col items-start gap-4 sm:items-end">
+          <a
+            href={APP_STORE_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="rounded-[8px] bg-white px-6 py-3 font-display font-bold text-[#1740A6]"
+          >
+            Download the app
+          </a>
+          <div className="flex flex-col gap-2 sm:items-end">
             <Link
               to="/privacy"
-              className="text-sm text-[#1740A6]/60 hover:text-[#1740A6] transition-colors"
+              className="font-body text-white/50 hover:text-white/80 transition-colors"
+              style={{ fontSize: "0.8rem" }}
             >
-              Privacy
+              Privacy Policy
             </Link>
             <Link
               to="/terms"
-              className="text-sm text-[#1740A6]/60 hover:text-[#1740A6] transition-colors"
+              className="font-body text-white/50 hover:text-white/80 transition-colors"
+              style={{ fontSize: "0.8rem" }}
             >
               Terms
             </Link>
           </div>
-
-          <div className="flex flex-col gap-3">
-            <a
-              href={INSTAGRAM_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-sm text-[#1740A6]/60 hover:text-[#1740A6] transition-colors"
-            >
-              Instagram
-            </a>
-            <a
-              href={TIKTOK_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-sm text-[#1740A6]/60 hover:text-[#1740A6] transition-colors"
-            >
-              TikTok
-            </a>
-          </div>
         </div>
       </div>
 
-      <div className="border-t border-[#1740A6]/10">
+      <div style={{ borderTop: "1px solid rgba(255,255,255,0.15)" }}>
         <div className="mx-auto max-w-6xl px-5 sm:px-8 py-5">
-          <p className="text-xs text-[#1740A6]/45">
-            &copy; 2026 Coetzee Tech LLC. All rights reserved.
+          <p
+            className="font-body text-white/40 text-center"
+            style={{ fontSize: "0.8rem" }}
+          >
+            2026 SafeRides. Operated by Coetzee Tech LLC. All rights reserved.
           </p>
         </div>
       </div>

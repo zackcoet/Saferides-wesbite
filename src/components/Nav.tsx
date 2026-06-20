@@ -1,12 +1,32 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
 
 const NAV_LINKS = [
-  { label: "Ride", href: "#how-it-works" },
-  { label: "Drive", href: "#drive" },
+  { label: "Safety", href: "#safety" },
+  { label: "How It Works", href: "#how-it-works" },
+  { label: "For Businesses", href: "#for-businesses" },
+  { label: "Drivers", href: "#drivers" },
 ];
 
-const APP_STORE_URL = "https://apps.apple.com/app/id6751057062";
+const APP_STORE_URL = "https://apps.apple.com/app/id6750380495";
+
+function MenuIcon() {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true">
+      <line x1="3" y1="6" x2="21" y2="6" />
+      <line x1="3" y1="12" x2="21" y2="12" />
+      <line x1="3" y1="18" x2="21" y2="18" />
+    </svg>
+  );
+}
+
+function CloseIcon() {
+  return (
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true">
+      <line x1="18" y1="6" x2="6" y2="18" />
+      <line x1="6" y1="6" x2="18" y2="18" />
+    </svg>
+  );
+}
 
 export default function Nav() {
   const [open, setOpen] = useState(false);
@@ -14,6 +34,7 @@ export default function Nav() {
 
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 8);
+    handler();
     window.addEventListener("scroll", handler, { passive: true });
     return () => window.removeEventListener("scroll", handler);
   }, []);
@@ -28,111 +49,91 @@ export default function Nav() {
 
   return (
     <header
-      className={`fixed inset-x-0 top-0 z-50 bg-white transition-all duration-300 ${
-        scrolled ? "shadow-[0_1px_0_0_rgba(23,64,166,0.12)]" : ""
+      className={`fixed inset-x-0 top-0 z-50 bg-white transition-colors duration-300 ${
+        scrolled ? "border-b border-[#1740A614]" : "border-b border-transparent"
       }`}
     >
       <div className="mx-auto max-w-6xl px-5 sm:px-8 flex h-16 items-center justify-between">
         <a
           href="/"
-          className="text-[#1740A6] font-bold text-xl tracking-tight select-none"
+          className="font-display font-black tracking-tight text-[#1740A6] select-none"
+          style={{ fontSize: "1.25rem" }}
         >
-          Saferides
+          SafeRides
         </a>
 
-        <nav className="hidden md:flex items-center gap-7">
+        <nav className="hidden md:flex items-center gap-8">
           {NAV_LINKS.map((l) => (
             <button
               key={l.href}
               onClick={() => handleNavClick(l.href)}
-              className="text-sm font-medium text-[#1740A6]/80 hover:text-[#1740A6] transition-colors bg-transparent border-none cursor-pointer"
+              className="font-body font-medium text-[#1740A6]/65 hover:text-[#1740A6] transition-colors bg-transparent border-none cursor-pointer"
             >
               {l.label}
             </button>
           ))}
-          <Link
-            to="/apply"
-            className="text-sm font-medium text-[#1740A6]/80 hover:text-[#1740A6] transition-colors"
-          >
-            Apply
-          </Link>
-          <a
-            href={APP_STORE_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="ml-1 rounded-full bg-[#1740A6] px-5 py-2 text-sm font-semibold text-white hover:bg-[#1740A6]/90 transition-colors"
-          >
-            Get the app
-          </a>
         </nav>
 
+        <a
+          href={APP_STORE_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="hidden md:inline-flex rounded-[8px] bg-[#1740A6] px-5 py-2 font-body font-semibold text-white"
+        >
+          Get the app
+        </a>
+
         <button
-          aria-label={open ? "Close menu" : "Open menu"}
-          onClick={() => setOpen((v) => !v)}
+          aria-label="Open menu"
+          onClick={() => setOpen(true)}
           className="md:hidden p-2 text-[#1740A6]"
         >
-          {open ? (
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="22"
-              height="22"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <line x1="18" y1="6" x2="6" y2="18" />
-              <line x1="6" y1="6" x2="18" y2="18" />
-            </svg>
-          ) : (
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="22"
-              height="22"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <line x1="3" y1="6" x2="21" y2="6" />
-              <line x1="3" y1="12" x2="21" y2="12" />
-              <line x1="3" y1="18" x2="21" y2="18" />
-            </svg>
-          )}
+          <MenuIcon />
         </button>
       </div>
 
+      {/* Mobile full-screen overlay */}
       {open && (
-        <div className="md:hidden border-t border-gray-100 bg-white px-5 py-5 flex flex-col gap-5">
-          {NAV_LINKS.map((l) => (
-            <button
-              key={l.href}
-              onClick={() => handleNavClick(l.href)}
-              className="text-left text-base font-medium text-[#1740A6]/80 hover:text-[#1740A6] bg-transparent border-none cursor-pointer"
+        <div className="md:hidden fixed inset-0 z-50 bg-white flex flex-col">
+          <div className="flex h-16 items-center justify-between px-5">
+            <span
+              className="font-display font-black tracking-tight text-[#1740A6]"
+              style={{ fontSize: "1.25rem" }}
             >
-              {l.label}
+              SafeRides
+            </span>
+            <button
+              aria-label="Close menu"
+              onClick={() => setOpen(false)}
+              className="p-2 text-[#1740A6]"
+            >
+              <CloseIcon />
             </button>
-          ))}
-          <Link
-            to="/apply"
-            onClick={() => setOpen(false)}
-            className="text-base font-medium text-[#1740A6]/80 hover:text-[#1740A6]"
-          >
-            Apply
-          </Link>
-          <a
-            href={APP_STORE_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={() => setOpen(false)}
-            className="rounded-full bg-[#1740A6] px-5 py-3 text-center text-sm font-semibold text-white"
-          >
-            Get the app
-          </a>
+          </div>
+
+          <nav className="flex-1 flex flex-col items-center justify-center gap-8 px-6">
+            {NAV_LINKS.map((l) => (
+              <button
+                key={l.href}
+                onClick={() => handleNavClick(l.href)}
+                className="font-display font-bold text-2xl text-[#1740A6] bg-transparent border-none cursor-pointer"
+              >
+                {l.label}
+              </button>
+            ))}
+          </nav>
+
+          <div className="px-6 pb-10">
+            <a
+              href={APP_STORE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => setOpen(false)}
+              className="block w-full rounded-[8px] bg-[#1740A6] px-5 py-4 text-center font-body font-semibold text-white"
+            >
+              Get the app
+            </a>
+          </div>
         </div>
       )}
     </header>

@@ -1,12 +1,12 @@
 import Nav from "@/components/Nav";
 import Hero from "@/components/Hero";
-import Manifesto from "@/components/Manifesto";
 import Safety from "@/components/Safety";
+import Trending from "@/components/Trending";
 import HowItWorks from "@/components/HowItWorks";
-import ForDrivers from "@/components/ForDrivers";
+import ForBusinesses from "@/components/ForBusinesses";
+import Drivers from "@/components/Drivers";
 import JoinTheTeam from "@/components/JoinTheTeam";
-import FAQ from "@/components/FAQ";
-import DownloadCTA from "@/components/DownloadCTA";
+import RequestSchool from "@/components/RequestSchool";
 import Footer from "@/components/Footer";
 
 export default function Index() {
@@ -15,13 +15,13 @@ export default function Index() {
       <Nav />
       <main>
         <Hero />
-        <Manifesto />
         <Safety />
+        <Trending />
         <HowItWorks />
-        <ForDrivers />
+        <ForBusinesses />
+        <Drivers />
         <JoinTheTeam />
-        <FAQ />
-        <DownloadCTA />
+        <RequestSchool />
       </main>
       <Footer />
     </>

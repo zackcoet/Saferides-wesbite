@@ -7,7 +7,7 @@ import Footer from "@/components/Footer";
 
 export default function StoryPage() {
   useEffect(() => {
-    document.title = "How SafeRides started — Saferides";
+    document.title = "How SafeRides started — SafeRides";
 
     // noindex until legal/PR review is complete — remove once approved
     let meta = document.querySelector('meta[name="robots"]') as HTMLMetaElement | null;
@@ -29,7 +29,7 @@ export default function StoryPage() {
       <Nav />
 
       <main className="mx-auto max-w-2xl px-5 sm:px-8 pt-28 pb-24">
-        <h1 className="text-4xl sm:text-5xl font-bold text-[#0D1B4B] leading-tight mb-5">
+        <h1 className="text-4xl sm:text-5xl font-bold text-[#1740A6] leading-tight mb-5">
           How SafeRides started.
         </h1>
 
@@ -37,7 +37,7 @@ export default function StoryPage() {
           A safety incident. A question nobody had a good answer to. A platform built to fix it.
         </p>
 
-        <div className="space-y-7 text-[#0D1B4B]/70 text-base sm:text-lg leading-relaxed">
+        <div className="space-y-7 text-[#1740A6]/70 text-base sm:text-lg leading-relaxed">
           <p>
             In 2019, an attack near a major university campus put a spotlight on a question
             students had been quietly asking for years: are rideshares actually safe? After the
@@ -59,10 +59,10 @@ export default function StoryPage() {
           </p>
         </div>
 
-        <div className="mt-16 pt-8 border-t border-[#E4EAF8]">
+        <div className="mt-16 pt-8 border-t border-[#1740A6]/10">
           <Link
             to="/"
-            className="text-sm font-semibold text-[#1740A6] hover:text-[#0F2F8C] transition-colors"
+            className="text-sm font-semibold text-[#1740A6] hover:text-[#1740A6]/70 transition-colors"
           >
             Back to SafeRides
           </Link>

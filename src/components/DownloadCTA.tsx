@@ -36,7 +36,7 @@ export default function DownloadCTA() {
 
         <img
           src="/phone-mockup.png"
-          alt="Saferides app"
+          alt="SafeRides app"
           className="mt-16 w-full max-w-xs rounded-[2.5rem] object-contain"
           loading="lazy"
         />

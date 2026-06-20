@@ -63,14 +63,18 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
-        // Saferides brand tokens
-        brand: "#1740A6",
-        "brand-dark": "#0F2F8C",
-        navy: "#0D1B4B",
+        // SafeRides brand tokens — Royal Blue and white only
+        brand: {
+          blue: "#1740A6",
+          blue60: "#1740A699",
+          blue20: "#1740A633",
+          blue08: "#1740A614",
+          white: "#FFFFFF",
+        },
       },
       fontFamily: {
-        sans: ["Space Grotesk", "system-ui", "sans-serif"],
-        display: ["Space Grotesk", "system-ui", "sans-serif"],
+        display: ["Archivo", "sans-serif"],
+        body: ["Inter", "sans-serif"],
       },
       borderRadius: {
         lg: "var(--radius)",

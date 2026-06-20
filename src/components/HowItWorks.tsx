@@ -1,39 +1,87 @@
-const STEPS = [
+const RIDER_STEPS = [
   {
-    num: "01",
     title: "Open the app",
-    body: "Set your pickup and drop-off. See your fare upfront before you book anything.",
+    body: "Request a ride from anywhere on campus. Drop your pin, set your destination.",
   },
   {
-    num: "02",
-    title: "Get matched",
-    body: "A verified student driver at your university accepts your ride. You see their name, photo, and car.",
+    title: "A student picks you up",
+    body: "A verified driver from your school accepts. Track them live on the map.",
   },
   {
-    num: "03",
-    title: "Confirm and ride",
-    body: "When your driver arrives share your pickup code. Confirmed match. Safe ride.",
+    title: "Confirm your code, get in",
+    body: "Your driver reads your 4-digit pickup code aloud. It matches — you're in.",
   },
 ];
 
+const DRIVER_STEPS = [
+  {
+    title: "Apply and get verified",
+    body: "Submit your documents, pass verification, and get approved. The whole process happens in the app.",
+  },
+  {
+    title: "Go online when you want",
+    body: "Set your own hours. Drive between classes, on weekends, whenever works for you.",
+  },
+  {
+    title: "Earn 100% of every fare",
+    body: "SafeRides takes zero platform fees. Every dollar a rider pays goes directly to you.",
+  },
+];
+
+function StepList({ header, steps }: { header: string; steps: typeof RIDER_STEPS }) {
+  return (
+    <div>
+      <h3
+        className="font-display font-bold text-[#1740A6]"
+        style={{ fontSize: "1.125rem" }}
+      >
+        {header}
+      </h3>
+      <div className="mt-6 flex flex-col gap-8">
+        {steps.map((step, i) => (
+          <div key={step.title} className="flex gap-5">
+            <span
+              className="font-display font-black leading-none text-[#1740A6]/10 tabular-nums flex-shrink-0"
+              style={{ fontSize: "3rem" }}
+              aria-hidden="true"
+            >
+              {i + 1}
+            </span>
+            <div className="pt-1">
+              <p
+                className="font-display font-bold text-[#1740A6]"
+                style={{ fontSize: "1rem" }}
+              >
+                {step.title}
+              </p>
+              <p
+                className="mt-1.5 font-body text-[#1740A6]/65"
+                style={{ fontSize: "0.9rem", lineHeight: 1.6 }}
+              >
+                {step.body}
+              </p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function HowItWorks() {
   return (
-    <section id="how-it-works" className="bg-[#1740A6]/5 py-24 sm:py-32">
+    <section id="how-it-works" className="bg-white py-20 sm:py-28">
       <div className="mx-auto max-w-6xl px-5 sm:px-8">
-        <h2 className="text-4xl sm:text-5xl font-bold text-[#1740A6] mb-16 sm:mb-20">
-          How it works.
+        <h2
+          className="font-display font-black text-[#1740A6]"
+          style={{ fontSize: "clamp(2rem, 4vw, 3rem)", lineHeight: 1.05 }}
+        >
+          Simple for riders. Simple for drivers.
         </h2>
 
-        <div className="grid gap-12 md:grid-cols-3 md:gap-10">
-          {STEPS.map((step) => (
-            <div key={step.num} className="flex flex-col gap-4">
-              <span className="block text-6xl font-bold leading-none text-[#1740A6]/25 tabular-nums">
-                {step.num}
-              </span>
-              <h3 className="text-xl font-bold text-[#1740A6]">{step.title}</h3>
-              <p className="text-[#1740A6]/70 leading-relaxed">{step.body}</p>
-            </div>
-          ))}
+        <div className="mt-12 grid gap-12 md:grid-cols-2 md:gap-16">
+          <StepList header="As a rider" steps={RIDER_STEPS} />
+          <StepList header="As a driver" steps={DRIVER_STEPS} />
         </div>
       </div>
     </section>
