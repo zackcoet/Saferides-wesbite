@@ -117,17 +117,11 @@ const applicationSchema = z.object({
   firstName: z.string().trim().min(1, "First name is required"),
   lastName: z.string().trim().min(1, "Last name is required"),
   school: z.string().trim().optional(),
-  // NOTE: This .edu check is client-side only. Server-side validation of the
-  // email domain should be added later (e.g. a Cloud Function) before trusting it.
   email: z
     .string()
     .trim()
     .min(1, "Email is required")
-    .email("Enter a valid email address")
-    .refine(
-      (value) => value.toLowerCase().endsWith(".edu"),
-      "Email must be a .edu address",
-    ),
+    .email("Enter a valid email address"),
   phone: z.string().trim().min(1, "Phone number is required"),
   role: z.enum(
     ["Campus Representative", "Intern", "Marketing Manager", "Motion Designer"],
@@ -213,8 +207,17 @@ export default function ApplicationForm() {
         : null;
 
     try {
-      // Anonymous auth matches the rest of the site's Firebase access pattern.
-      await signInAnonymously(auth);
+      // Best-effort anonymous auth. The Storage and Firestore rules for these
+      // public intake paths allow unauthenticated writes, so a failure here
+      // (e.g. anonymous auth disabled) should not block the submission.
+      try {
+        await signInAnonymously(auth);
+      } catch (authError) {
+        console.warn(
+          "Anonymous sign-in failed; continuing unauthenticated.",
+          authError,
+        );
+      }
 
       const timestamp = Date.now();
       const safeName = name.replace(/[^a-zA-Z0-9]+/g, "_") || "applicant";
@@ -234,7 +237,8 @@ export default function ApplicationForm() {
         portfolioLink,
         resumeUrl,
         resumeStoragePath,
-        school: values.school,
+        // school is optional; Firestore rejects undefined, so coalesce to null.
+        school: values.school ?? null,
         status: "pending",
         submittedAt: serverTimestamp(),
       });
@@ -242,8 +246,19 @@ export default function ApplicationForm() {
       setStatus("success");
       reset();
     } catch (error) {
-      // Do not expose Firebase error details to the user.
-      console.error("Application submission failed:", error);
+      // Detailed diagnostics in the console; the user only sees a generic message.
+      const e = error as { code?: string; message?: string; stack?: string };
+      console.error(
+        "Application submission failed:\n",
+        "code:",
+        e?.code,
+        "\nmessage:",
+        e?.message,
+        "\nstack:",
+        e?.stack,
+        "\nraw error:",
+        error,
+      );
       setStatus("error");
     }
   };
@@ -347,13 +362,13 @@ export default function ApplicationForm() {
 
       <div className="space-y-2">
         <Label htmlFor="email" className="text-[#1740A6]">
-          School Email (.edu)
+          Email
         </Label>
         <Input
           id="email"
           type="email"
           autoComplete="email"
-          placeholder="you@school.edu"
+          placeholder="your@email.com"
           disabled={isSubmitting}
           {...register("email")}
         />

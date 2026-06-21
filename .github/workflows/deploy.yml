@@ -34,6 +34,13 @@ jobs:
 
       - name: Build
         run: npm run build
+        # Firebase web client config is public (it ships in the client bundle);
+        # security is enforced by Storage/Firestore rules, not by hiding these.
+        env:
+          VITE_FIREBASE_API_KEY: AIzaSyBwLL99C2wpc7wzj6ANTt2UW6LUNr3Yhp4
+          VITE_FIREBASE_AUTH_DOMAIN: saferides-73eb2.firebaseapp.com
+          VITE_FIREBASE_PROJECT_ID: saferides-73eb2
+          VITE_FIREBASE_STORAGE_BUCKET: saferides-73eb2.firebasestorage.app
 
       - name: SPA fallback - copy index.html to 404.html
         run: cp dist/index.html dist/404.html
