@@ -1,10 +1,13 @@
 import { useState, useEffect } from "react";
+import { Link, useLocation } from "react-router-dom";
 
-const NAV_LINKS = [
-  { label: "Safety", href: "#safety" },
-  { label: "How It Works", href: "#how-it-works" },
-  { label: "For Businesses", href: "#for-businesses" },
-  { label: "Drivers", href: "#drivers" },
+type NavLinkItem = { label: string; hash?: string; to?: string };
+
+const NAV_LINKS: NavLinkItem[] = [
+  { label: "Safety", hash: "safety" },
+  { label: "How It Works", hash: "how-it-works" },
+  { label: "For Businesses", to: "/businesses" },
+  { label: "Drivers", to: "/drivers" },
 ];
 
 const APP_STORE_URL = "https://apps.apple.com/app/id6750380495";
@@ -31,6 +34,7 @@ function CloseIcon() {
 export default function Nav() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const location = useLocation();
 
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 8);
@@ -39,11 +43,15 @@ export default function Nav() {
     return () => window.removeEventListener("scroll", handler);
   }, []);
 
-  const handleNavClick = (href: string) => {
+  // Scroll to a homepage section. If we are on another route, navigate home
+  // with the hash so the browser scrolls to the section after the page loads.
+  const handleHashClick = (hash: string) => {
     setOpen(false);
-    if (href.startsWith("#")) {
-      const el = document.getElementById(href.slice(1));
+    if (location.pathname === "/") {
+      const el = document.getElementById(hash);
       if (el) el.scrollIntoView({ behavior: "smooth" });
+    } else {
+      window.location.href = `/#${hash}`;
     }
   };
 
@@ -63,15 +71,25 @@ export default function Nav() {
         </a>
 
         <nav className="hidden md:flex items-center gap-8">
-          {NAV_LINKS.map((l) => (
-            <button
-              key={l.href}
-              onClick={() => handleNavClick(l.href)}
-              className="font-body font-medium text-[#1740A6]/65 hover:text-[#1740A6] transition-colors bg-transparent border-none cursor-pointer"
-            >
-              {l.label}
-            </button>
-          ))}
+          {NAV_LINKS.map((l) =>
+            l.to ? (
+              <Link
+                key={l.label}
+                to={l.to}
+                className="font-body font-medium text-[#1740A6]/65 hover:text-[#1740A6] transition-colors"
+              >
+                {l.label}
+              </Link>
+            ) : (
+              <button
+                key={l.label}
+                onClick={() => handleHashClick(l.hash!)}
+                className="font-body font-medium text-[#1740A6]/65 hover:text-[#1740A6] transition-colors bg-transparent border-none cursor-pointer"
+              >
+                {l.label}
+              </button>
+            ),
+          )}
         </nav>
 
         <a
@@ -112,15 +130,26 @@ export default function Nav() {
           </div>
 
           <nav className="flex-1 flex flex-col items-center justify-center gap-8 px-6">
-            {NAV_LINKS.map((l) => (
-              <button
-                key={l.href}
-                onClick={() => handleNavClick(l.href)}
-                className="font-display font-bold text-2xl text-[#1740A6] bg-transparent border-none cursor-pointer"
-              >
-                {l.label}
-              </button>
-            ))}
+            {NAV_LINKS.map((l) =>
+              l.to ? (
+                <Link
+                  key={l.label}
+                  to={l.to}
+                  onClick={() => setOpen(false)}
+                  className="font-display font-bold text-2xl text-[#1740A6]"
+                >
+                  {l.label}
+                </Link>
+              ) : (
+                <button
+                  key={l.label}
+                  onClick={() => handleHashClick(l.hash!)}
+                  className="font-display font-bold text-2xl text-[#1740A6] bg-transparent border-none cursor-pointer"
+                >
+                  {l.label}
+                </button>
+              ),
+            )}
           </nav>
 
           <div className="px-6 pb-10">

@@ -1,11 +1,8 @@
+import { Link } from "react-router-dom";
+
 const DRIVER_APP_STORE_URL = "https://apps.apple.com/app/id6751057062";
 
 export default function Drivers() {
-  const scrollTo = (id: string) => {
-    const el = document.getElementById(id);
-    if (el) el.scrollIntoView({ behavior: "smooth" });
-  };
-
   return (
     <section id="drivers" className="bg-[#1740A6] py-20 sm:py-28">
       <div className="mx-auto max-w-6xl px-5 sm:px-8">
@@ -33,12 +30,12 @@ export default function Drivers() {
           >
             Become a driver
           </a>
-          <button
-            onClick={() => scrollTo("how-it-works")}
-            className="rounded-[10px] border border-white bg-transparent px-7 py-3.5 font-display font-bold text-white cursor-pointer"
+          <Link
+            to="/drivers"
+            className="rounded-[10px] border border-white bg-transparent px-7 py-3.5 font-display font-bold text-white"
           >
             Learn more
-          </button>
+          </Link>
         </div>
       </div>
     </section>

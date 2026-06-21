@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 const VALUE_PROPS = [
   {
@@ -102,6 +103,15 @@ export default function ForBusinesses() {
               </p>
             </div>
           ))}
+        </div>
+
+        <div className="mt-10">
+          <Link
+            to="/businesses"
+            className="inline-block rounded-[10px] bg-[#1740A6] px-7 py-3.5 font-body font-semibold text-white"
+          >
+            Learn more
+          </Link>
         </div>
 
         <div

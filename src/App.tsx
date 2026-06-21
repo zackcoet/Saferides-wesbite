@@ -10,6 +10,8 @@ import NotFound from "./pages/NotFound";
 const Privacy = lazy(() => import("./pages/Privacy"));
 const Terms = lazy(() => import("./pages/Terms"));
 const Apply = lazy(() => import("./pages/Apply"));
+const Businesses = lazy(() => import("./pages/Businesses"));
+const DriversPage = lazy(() => import("./pages/DriversPage"));
 
 export default function App() {
   return (
@@ -21,6 +23,8 @@ export default function App() {
           <Route path="/terms" element={<Terms />} />
           <Route path="/story" element={<StoryPage />} />
           <Route path="/apply" element={<Apply />} />
+          <Route path="/businesses" element={<Businesses />} />
+          <Route path="/drivers" element={<DriversPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
