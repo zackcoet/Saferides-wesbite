@@ -24,10 +24,99 @@ const PDF_MIME = "application/pdf";
 // Roles for which a portfolio / previous-work link is relevant.
 const PORTFOLIO_ROLES = ["Motion Designer", "Marketing Manager"];
 
+// Static list of US universities for the School autocomplete (no external API).
+const UNIVERSITIES = [
+  "University of South Carolina",
+  "Clemson University",
+  "University of Georgia",
+  "University of Tennessee",
+  "University of Alabama",
+  "Auburn University",
+  "Florida State University",
+  "University of Florida",
+  "Georgia Tech",
+  "University of Mississippi",
+  "Mississippi State University",
+  "Louisiana State University",
+  "University of Arkansas",
+  "University of Kentucky",
+  "University of Louisville",
+  "Vanderbilt University",
+  "Wake Forest University",
+  "Duke University",
+  "University of North Carolina",
+  "NC State University",
+  "Virginia Tech",
+  "University of Virginia",
+  "Penn State University",
+  "Ohio State University",
+  "University of Michigan",
+  "Michigan State University",
+  "Indiana University",
+  "Purdue University",
+  "University of Wisconsin",
+  "University of Minnesota",
+  "Northwestern University",
+  "University of Illinois",
+  "University of Iowa",
+  "Iowa State University",
+  "University of Missouri",
+  "Kansas State University",
+  "University of Kansas",
+  "University of Nebraska",
+  "Colorado State University",
+  "University of Colorado",
+  "University of Utah",
+  "Arizona State University",
+  "University of Arizona",
+  "University of Oregon",
+  "Oregon State University",
+  "University of Washington",
+  "Washington State University",
+  "UCLA",
+  "USC",
+  "UC Berkeley",
+  "UC San Diego",
+  "UC Davis",
+  "Stanford University",
+  "Harvard University",
+  "Yale University",
+  "Columbia University",
+  "NYU",
+  "Boston University",
+  "Northeastern University",
+  "Syracuse University",
+  "Fordham University",
+  "George Washington University",
+  "American University",
+  "Georgetown University",
+  "Temple University",
+  "Drexel University",
+  "Tulane University",
+  "Emory University",
+  "University of Miami",
+  "University of Tampa",
+  "Florida International University",
+  "University of Central Florida",
+  "University of South Florida",
+  "Marquette University",
+  "DePaul University",
+  "Loyola University Chicago",
+  "University of Denver",
+  "Baylor University",
+  "Texas A&M University",
+  "University of Texas",
+  "Texas Tech University",
+  "TCU",
+  "SMU",
+  "Rice University",
+  "University of Houston",
+];
+
 const applicationSchema = z.object({
   firstName: z.string().trim().min(1, "First name is required"),
   lastName: z.string().trim().min(1, "Last name is required"),
-  school: z.string().trim().min(1, "School is required"),
+  school: z.string().trim().optional(),
   // NOTE: This .edu check is client-side only. Server-side validation of the
   // email domain should be added later (e.g. a Cloud Function) before trusting it.
   email: z
@@ -74,6 +163,7 @@ export default function ApplicationForm() {
     handleSubmit,
     control,
     reset,
+    setValue,
     formState: { errors },
   } = useForm<ApplicationValues>({
     resolver: zodResolver(applicationSchema),
@@ -90,6 +180,20 @@ export default function ApplicationForm() {
   // Show the portfolio field only for Motion Designer / Marketing Manager.
   const selectedRole = useWatch({ control, name: "role" });
   const showPortfolio = PORTFOLIO_ROLES.includes(selectedRole as string);
+
+  // School autocomplete: filter the static university list by any substring.
+  const schoolReg = register("school");
+  const [schoolOpen, setSchoolOpen] = useState(false);
+  const schoolQuery = ((useWatch({ control, name: "school" }) as string) ?? "")
+    .trim()
+    .toLowerCase();
+  const schoolSuggestions =
+    schoolQuery.length >= 2
+      ? UNIVERSITIES.filter((u) => u.toLowerCase().includes(schoolQuery)).slice(
+          0,
+          6,
+        )
+      : [];
 
   const onSubmit = async (values: ApplicationValues) => {
     setStatus("submitting");
@@ -200,19 +304,45 @@ export default function ApplicationForm() {
 
       <div className="space-y-2">
         <Label htmlFor="school" className="text-[#1740A6]">
-          School
+          School (optional)
         </Label>
-        <Input
-          id="school"
-          autoComplete="organization"
-          disabled={isSubmitting}
-          {...register("school")}
-        />
-        {errors.school && (
-          <p className="text-sm font-medium text-[#1740A6]">
-            {errors.school.message}
-          </p>
-        )}
+        <div className="relative">
+          <Input
+            id="school"
+            autoComplete="off"
+            disabled={isSubmitting}
+            {...schoolReg}
+            onChange={(e) => {
+              schoolReg.onChange(e);
+              setSchoolOpen(true);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Escape") setSchoolOpen(false);
+            }}
+          />
+          {schoolOpen && schoolSuggestions.length > 0 && (
+            <ul
+              className="absolute left-0 right-0 top-full mt-1 overflow-hidden rounded-[8px] border border-[#1740A6]/20 bg-white"
+              style={{ zIndex: 50 }}
+            >
+              {schoolSuggestions.map((u) => (
+                <li key={u}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setValue("school", u);
+                      setSchoolOpen(false);
+                    }}
+                    className="block w-full text-left font-body font-normal text-[#1740A6] hover:bg-[#1740A608]"
+                    style={{ padding: "10px 14px" }}
+                  >
+                    {u}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
       </div>
 
       <div className="space-y-2">
