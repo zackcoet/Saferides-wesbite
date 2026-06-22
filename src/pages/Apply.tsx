@@ -92,6 +92,13 @@ const ROLES: Role[] = [
     ],
     compensation: "$15-25/hr",
   },
+  {
+    title: "Sales Intern",
+    badge: "Part Time | Internship | $15/hr | On-Site | Commission",
+    description:
+      "Help SafeRides grow by building and maintaining relationships with local businesses, bars, restaurants, and venues near campus. You will identify partnership opportunities, conduct outreach, and keep existing partners engaged. This is a hands-on role with real responsibility from day one.",
+    compensation: "$15/hr, in person, with the opportunity to earn commission",
+  },
 ];
 
 export default function Apply() {
