@@ -22,7 +22,7 @@ const MAX_RESUME_BYTES = 5 * 1024 * 1024; // 5MB
 const PDF_MIME = "application/pdf";
 
 // Roles for which a portfolio / previous-work link is relevant.
-const PORTFOLIO_ROLES = ["Motion Designer", "Marketing Manager"];
+const PORTFOLIO_ROLES = ["Motion Designer or Content Creator", "Marketing Manager"];
 
 // Static list of US universities for the School autocomplete (no external API).
 const UNIVERSITIES = [
@@ -124,7 +124,7 @@ const applicationSchema = z.object({
     .email("Enter a valid email address"),
   phone: z.string().trim().min(1, "Phone number is required"),
   role: z.enum(
-    ["Campus Representative", "Intern", "Marketing Manager", "Motion Designer", "Sales Intern"],
+    ["Campus Representative", "Intern", "Marketing Manager", "Motion Designer or Content Creator", "Sales Intern"],
     {
       required_error: "Please select a role",
     },
@@ -171,7 +171,7 @@ export default function ApplicationForm() {
     },
   });
 
-  // Show the portfolio field only for Motion Designer / Marketing Manager.
+  // Show the portfolio field only for Motion Designer or Content Creator / Marketing Manager.
   const selectedRole = useWatch({ control, name: "role" });
   const showPortfolio = PORTFOLIO_ROLES.includes(selectedRole as string);
 
@@ -422,8 +422,8 @@ export default function ApplicationForm() {
                 <SelectItem value="Marketing Manager">
                   Marketing Manager
                 </SelectItem>
-                <SelectItem value="Motion Designer">
-                  Motion Designer
+                <SelectItem value="Motion Designer or Content Creator">
+                  Motion Designer or Content Creator
                 </SelectItem>
                 <SelectItem value="Sales Intern">Sales Intern</SelectItem>
               </SelectContent>

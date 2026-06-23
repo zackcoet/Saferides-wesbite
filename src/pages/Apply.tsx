@@ -72,7 +72,7 @@ const ROLES: Role[] = [
     compensation: "$15-25/hr based on experience | Remote or In Person",
   },
   {
-    title: "Motion Designer",
+    title: "Motion Designer or Content Creator",
     badge: "Part Time | $15-25/hr",
     description:
       "SafeRides is looking for a motion designer to create short-form video content, animations, and marketing visuals for social media. You will design and animate content that shows what SafeRides looks like on campus — reels, ads, motion graphics, and anything that stops a scroll.",
