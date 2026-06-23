@@ -124,7 +124,7 @@ const applicationSchema = z.object({
     .email("Enter a valid email address"),
   phone: z.string().trim().min(1, "Phone number is required"),
   role: z.enum(
-    ["Campus Representative", "Intern", "Marketing Manager", "Motion Designer"],
+    ["Campus Representative", "Intern", "Marketing Manager", "Motion Designer", "Sales Intern"],
     {
       required_error: "Please select a role",
     },
@@ -425,6 +425,7 @@ export default function ApplicationForm() {
                 <SelectItem value="Motion Designer">
                   Motion Designer
                 </SelectItem>
+                <SelectItem value="Sales Intern">Sales Intern</SelectItem>
               </SelectContent>
             </Select>
           )}
