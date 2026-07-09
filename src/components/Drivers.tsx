@@ -10,7 +10,7 @@ export default function Drivers() {
           className="font-display font-black text-white"
           style={{ fontSize: "clamp(2.25rem, 4vw, 3.5rem)", lineHeight: 1.05 }}
         >
-          Drive your campus. Keep everything you earn.
+          Drive your campus. Earn on your schedule.
         </h2>
         <p
           className="mt-5 font-body text-white/70"

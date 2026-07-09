@@ -9,8 +9,8 @@ export default function ForDrivers() {
             Drive with SafeRides.
           </h2>
           <p className="text-white/75 text-lg max-w-md leading-relaxed">
-            You keep 100% of every fare. No platform cuts, no surprises. Set
-            your own schedule and earn on your terms.
+            See exactly what you'll earn before you accept every ride. No
+            surprises. Set your own schedule and earn on your terms.
           </p>
         </div>
 

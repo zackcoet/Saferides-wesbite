@@ -51,8 +51,8 @@ export default function Hero() {
             className="mt-6 font-body text-[#1740A6]/65 mx-auto md:mx-0"
             style={{ fontSize: "1.125rem", maxWidth: "480px" }}
           >
-            Verified student drivers. A pickup code every ride. Zero platform
-            fees. SafeRides was built for campus life — not adapted for it.
+            Verified student drivers. A pickup code every ride. Upfront pricing,
+            no surprises. SafeRides was built for campus life — not adapted for it.
           </motion.p>
 
           <motion.div

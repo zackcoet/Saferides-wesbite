@@ -15,7 +15,7 @@ const FAQS = [
   },
   {
     q: "How much does SafeRides cost?",
-    a: "Fares are shown upfront before you book. There are no platform fees, no surge pricing, and no hidden charges. What you see is what you pay.",
+    a: "Fares are shown upfront before you book. No surge pricing and no hidden charges — what you see is what you pay.",
   },
   {
     q: "What campuses is SafeRides on?",
@@ -23,7 +23,7 @@ const FAQS = [
   },
   {
     q: "How do I become a driver?",
-    a: "Tap Drive in the app or hit Become a Driver on this page to apply. You set your own hours and keep 100% of every fare.",
+    a: "Tap Drive in the app or hit Become a Driver on this page to apply. You set your own hours and see your earnings before every ride.",
   },
 ];
 

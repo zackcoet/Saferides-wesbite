@@ -23,8 +23,8 @@ const DRIVER_STEPS = [
     body: "Set your own hours. Drive between classes, on weekends, whenever works for you.",
   },
   {
-    title: "Earn 100% of every fare",
-    body: "SafeRides takes zero platform fees. Every dollar a rider pays goes directly to you.",
+    title: "See your pay before you accept",
+    body: "Every ride shows your earnings up front. No surprises, no guessing.",
   },
 ];
 
