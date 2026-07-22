@@ -8,6 +8,10 @@
 					{
 						"/": "/pay/*",
 						"comment": "SafeRides split payment links"
+					},
+					{
+						"/": "/r/*",
+						"comment": "PNM rush referral / campaign links"
 					}
 				]
 			}

@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width,initial-scale=1" />
+	<title>SafeRides — Download the App</title>
+	<meta name="description" content="Someone shared a SafeRides link with you. Download the app to get your first ride." />
+	<meta name="apple-itunes-app" content="app-id=6750380495" />
+	<style>
+		* { box-sizing: border-box; }
+		html, body { margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #F5F7FB; color: #111; }
+		.wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
+		.card {
+			max-width: 420px; width: 100%; background: #fff; border-radius: 20px; padding: 32px 24px;
+			text-align: center; box-shadow: 0 10px 40px rgba(23, 78, 166, 0.12);
+		}
+		.logo { width: 64px; height: 64px; border-radius: 16px; background: #174EA6; margin: 0 auto 16px; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 800; font-size: 24px; letter-spacing: 0.5px; }
+		h1 { font-size: 22px; margin: 0 0 8px; }
+		p { font-size: 14px; line-height: 21px; color: #4B5563; margin: 0 0 22px; }
+		.btn { display: inline-block; width: 100%; padding: 14px 18px; border-radius: 12px; text-decoration: none; font-weight: 700; font-size: 15px; margin-bottom: 10px; }
+		.btn-primary { background: #174EA6; color: #fff; }
+		.btn-secondary { background: #EEF4FF; color: #174EA6; }
+		.code-box { background: #EEF4FF; border-radius: 10px; padding: 10px 16px; margin-bottom: 22px; font-size: 16px; font-weight: 700; letter-spacing: 0.08em; color: #174EA6; }
+		.small { font-size: 12px; color: #6B7280; margin-top: 12px; }
+	</style>
+</head>
+<body>
+	<div class="wrap">
+		<div class="card">
+			<div class="logo">SR</div>
+			<h1>You've been invited to SafeRides</h1>
+			<p>Download the free SafeRides Rider app to get your first ride. Your referral code will be applied automatically.</p>
+			<div class="code-box" id="codeDisplay" style="display:none"></div>
+			<a class="btn btn-primary" href="https://apps.apple.com/us/app/saferides-rider/id6750380495" target="_blank" rel="noopener">Download on the App Store</a>
+			<a class="btn btn-secondary" id="openApp" href="#" style="display:none">Already have the app? Open it</a>
+			<p class="small">SafeRides — Student-run rides, built for campus life.</p>
+		</div>
+	</div>
+	<script>
+		(function () {
+			// Extract referral code from path (/r/<code>) or query param (?code=<code>)
+			// This page is served both at /r/ and (via 404.html redirect) with ?code=
+			var code = '';
+			var pathMatch = window.location.pathname.match(/\/r\/([^/?#]+)/);
+			if (pathMatch) {
+				code = decodeURIComponent(pathMatch[1]);
+			} else {
+				var params = new URLSearchParams(window.location.search);
+				code = params.get('code') || '';
+			}
+
+			if (code) {
+				var box = document.getElementById('codeDisplay');
+				box.textContent = 'Your code: ' + code;
+				box.style.display = 'block';
+
+				var openBtn = document.getElementById('openApp');
+				openBtn.href = 'saferides://r/' + encodeURIComponent(code);
+				openBtn.style.display = 'inline-block';
+
+				// Attempt to open the app immediately — no-op if not installed
+				setTimeout(function () {
+					window.location.href = 'saferides://r/' + encodeURIComponent(code);
+				}, 300);
+			}
+		}());
+	</script>
+</body>
+</html>

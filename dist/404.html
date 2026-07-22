@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width,initial-scale=1" />
+	<title>SafeRides</title>
+	<style>
+		* { box-sizing: border-box; }
+		html, body { margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #F5F7FB; color: #111; }
+		.wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
+		.card {
+			max-width: 420px; width: 100%; background: #fff; border-radius: 20px; padding: 32px 24px;
+			text-align: center; box-shadow: 0 10px 40px rgba(23, 78, 166, 0.12);
+		}
+		.logo { width: 64px; height: 64px; border-radius: 16px; background: #174EA6; margin: 0 auto 16px; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 800; font-size: 24px; letter-spacing: 0.5px; }
+		h1 { font-size: 22px; margin: 0 0 8px; }
+		p { font-size: 14px; line-height: 21px; color: #4B5563; margin: 0 0 22px; }
+		.btn { display: inline-block; width: 100%; padding: 14px 18px; border-radius: 12px; text-decoration: none; font-weight: 700; font-size: 15px; margin-bottom: 10px; }
+		.btn-primary { background: #174EA6; color: #fff; }
+		.btn-secondary { background: #EEF4FF; color: #174EA6; }
+		.code-box { background: #EEF4FF; border-radius: 10px; padding: 10px 16px; margin-bottom: 22px; font-size: 16px; font-weight: 700; letter-spacing: 0.08em; color: #174EA6; }
+		.small { font-size: 12px; color: #6B7280; margin-top: 12px; }
+	</style>
+</head>
+<body>
+	<div class="wrap" id="root">
+		<div class="card">
+			<div class="logo">SR</div>
+			<h1 id="heading">Page not found</h1>
+			<p id="body-text">The page you're looking for doesn't exist.</p>
+			<a class="btn btn-primary" href="https://saferidesapp.com">Go to SafeRides</a>
+		</div>
+	</div>
+	<script>
+		(function () {
+			var path = window.location.pathname;
+
+			// Handle /r/:code referral links — these 404 on GitHub Pages because
+			// the file doesn't exist at that path. Serve the referral landing page inline.
+			var refMatch = path.match(/^\/r\/([^/?#]+)/);
+			if (!refMatch) return;
+
+			var code = decodeURIComponent(refMatch[1]);
+
+			document.getElementById('heading').textContent = "You've been invited to SafeRides";
+			document.getElementById('body-text').textContent =
+				'Download the free SafeRides Rider app to get your first ride. Your referral code will be applied automatically.';
+
+			var card = document.querySelector('.card');
+
+			// Code badge
+			var box = document.createElement('div');
+			box.className = 'code-box';
+			box.textContent = 'Your code: ' + code;
+			card.insertBefore(box, card.querySelector('a'));
+
+			// Replace generic CTA with App Store + open-app buttons
+			card.querySelector('a').remove();
+
+			var appStoreBtn = document.createElement('a');
+			appStoreBtn.className = 'btn btn-primary';
+			appStoreBtn.href = 'https://apps.apple.com/us/app/saferides-rider/id6750380495';
+			appStoreBtn.target = '_blank';
+			appStoreBtn.rel = 'noopener';
+			appStoreBtn.textContent = 'Download on the App Store';
+			card.appendChild(appStoreBtn);
+
+			var openBtn = document.createElement('a');
+			openBtn.className = 'btn btn-secondary';
+			openBtn.href = 'saferides://r/' + encodeURIComponent(code);
+			openBtn.textContent = 'Already have the app? Open it';
+			card.appendChild(openBtn);
+
+			var note = document.createElement('p');
+			note.className = 'small';
+			note.textContent = 'SafeRides — Student-run rides, built for campus life.';
+			card.appendChild(note);
+
+			// Attempt to open app immediately — no-op if not installed
+			setTimeout(function () {
+				window.location.href = 'saferides://r/' + encodeURIComponent(code);
+			}, 300);
+		}());
+	</script>
+</body>
+</html>
