@@ -29,6 +29,35 @@
       rel="stylesheet"
     />
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+
+    <!--
+      Referral / PNM rush deep links: /r/<code>
+
+      GitHub Pages has no rewrite rules, so /r/<code> is a path with no file and
+      is served by 404.html. The deploy workflow builds 404.html by copying this
+      file (SPA fallback for /apply, /drivers, ...), which means this script ends
+      up in 404.html too — that is exactly what makes it run for /r/<code>.
+
+      It forwards to /r/?code=<code>, a REAL page (public/r/index.html) that
+      already handles the ?code= form and shows the App Store link plus a
+      saferides:// open-app button. Reusing it avoids a second copy of that page.
+
+      Note this is only the no-app fallback. On a device with the Rider app
+      installed, iOS resolves https://saferidesapp.com/r/* as a Universal Link
+      via /.well-known/apple-app-site-association and opens the app directly —
+      the browser never loads this page at all.
+
+      Runs before the SPA bundle (which is type=module, therefore deferred), so
+      there is no flash of the React 404 first. No-ops on every other path.
+    -->
+    <script>
+      (function () {
+        var m = window.location.pathname.match(/^\/r\/([^/?#]+)\/?$/);
+        if (m) {
+          window.location.replace('/r/?code=' + encodeURIComponent(decodeURIComponent(m[1])));
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
