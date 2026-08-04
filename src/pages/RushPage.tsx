@@ -336,8 +336,8 @@ export default function RushPage() {
               />
               <StepCard
                 icon={IconShield}
-                title="If no brothers are online"
-                body="The PNM sees a clear message right away, not a long fake wait, and can request a normal paid ride instead if they need one."
+                title="If no brothers are online yet"
+                body="SafeRides actively searches for up to 2 minutes, with a real searching screen the whole time — not a silent freeze. If a brother comes online and matches during that window, the ride connects right away. If a genuine 2 minutes passes with no match, the PNM is clearly offered the option to request a normal paid ride instead."
               />
             </div>
           </div>
