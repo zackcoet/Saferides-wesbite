@@ -13,6 +13,7 @@ const Apply = lazy(() => import("./pages/Apply"));
 const Businesses = lazy(() => import("./pages/Businesses"));
 const DriversPage = lazy(() => import("./pages/DriversPage"));
 const SmsConsent = lazy(() => import("./pages/SmsConsent"));
+const RushPage = lazy(() => import("./pages/RushPage"));
 
 export default function App() {
   return (
@@ -27,6 +28,7 @@ export default function App() {
           <Route path="/businesses" element={<Businesses />} />
           <Route path="/drivers" element={<DriversPage />} />
           <Route path="/sms-consent" element={<SmsConsent />} />
+          <Route path="/rush" element={<RushPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
