@@ -4,8 +4,17 @@
 
 @layer base {
   :root {
+    /* shadcn tokens are stored as HSL components (wrapped in hsl() by the config)
+       and collapsed onto the 10 approved brand colors:
+       225 74% 37% = #1740A6 · 0 0% 100% = #FFFFFF · 223 48% 93% = #E5EAF6 (Light
+       Royal Blue) · 220 13% 91% = #E5E7EB (Light Gray) · 220 9% 46% = #6B7280
+       (Dark Gray) · 0 72% 51% = #DC2626 (Red). */
     --background: 0 0% 100%;
-    /* Royal Blue #1740A6 expressed as HSL components (shadcn wraps these in hsl()) */
+    /* Royal Blue #1740A6 expressed as HSL components (shadcn wraps these in hsl()).
+       DELIBERATE, PERMANENT EXCEPTION: SafeRides.com uses Royal Blue as its body
+       text color, not Black #1A1A1A. Blue is an approved brand color; this is an
+       intentional design choice for the marketing site. Do NOT "fix" this to
+       black in future color passes. */
     --foreground: 225 74% 37%;
 
     --card: 0 0% 100%;
@@ -17,32 +26,32 @@
     --primary: 225 74% 37%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 225 60% 95%;
+    --secondary: 223 48% 93%;
     --secondary-foreground: 225 74% 37%;
 
-    --muted: 225 40% 96%;
-    --muted-foreground: 225 35% 55%;
+    --muted: 0 0% 100%;
+    --muted-foreground: 220 9% 46%;
 
-    --accent: 225 60% 92%;
+    --accent: 223 48% 93%;
     --accent-foreground: 225 74% 37%;
 
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 98%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 225 30% 90%;
-    --input: 225 30% 90%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
     --ring: 225 74% 37%;
 
     --radius: 0.75rem;
 
     /* shadcn sidebar tokens, recolored into the Royal Blue family */
     --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 225 35% 45%;
+    --sidebar-foreground: 220 9% 46%;
     --sidebar-primary: 225 74% 37%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 225 60% 95%;
+    --sidebar-accent: 223 48% 93%;
     --sidebar-accent-foreground: 225 74% 37%;
-    --sidebar-border: 225 30% 90%;
+    --sidebar-border: 220 13% 91%;
     --sidebar-ring: 225 74% 37%;
   }
 }
@@ -57,6 +66,8 @@
   }
 
   body {
+    /* text-[#1740A6]: intentional Royal-Blue body text — see the --foreground
+       note above. Deliberate permanent exception; do not change to black. */
     @apply bg-white text-[#1740A6] antialiased;
     font-family: "Inter", system-ui, sans-serif;
   }

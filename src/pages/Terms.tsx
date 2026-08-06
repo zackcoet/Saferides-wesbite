@@ -1,47 +1,494 @@
-import { useEffect, useState } from "react";
-import { signInAnonymously } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
+import { useEffect } from "react";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
-import { auth, db } from "@/lib/firebase";
 
-type LegalContentState = {
-  content: string;
-  loading: boolean;
-};
+// The Terms of Service render from this in-file structured content only. We no
+// longer fetch from the Firestore `legal/terms` document (that field had become
+// truncated on the live site). The Firestore document is intentionally left in
+// place because the mobile apps still read other fields from it.
 
-async function loadLegalField(fieldName: "termsContent" | "privacyContent") {
-  await signInAnonymously(auth);
-  const snap = await getDoc(doc(db, "legal", "terms"));
-  const content = snap.exists() ? snap.data()[fieldName] : "";
-  return typeof content === "string" ? content.trim() : "";
+type Block =
+  | { type: "p"; text: string; caps?: boolean }
+  | { type: "h3"; text: string }
+  | { type: "ul"; items: string[] }
+  | { type: "dl"; items: { term: string; def: string }[] };
+
+type Section = { heading: string; blocks: Block[] };
+
+const INTRO: Block[] = [
+  {
+    type: "p",
+    caps: true,
+    text: "PLEASE READ THESE TERMS OF SERVICE CAREFULLY. THEY CONTAIN IMPORTANT INFORMATION ABOUT YOUR LEGAL RIGHTS, REMEDIES, AND OBLIGATIONS.",
+  },
+  {
+    type: "p",
+    caps: true,
+    text: "BY AGREEING TO THESE TERMS, YOU AGREE THAT DISPUTES BETWEEN YOU AND SAFERIDES WILL BE RESOLVED BY BINDING, INDIVIDUAL ARBITRATION, AND YOU WAIVE YOUR RIGHT TO A TRIAL BY JURY AND YOUR RIGHT TO PARTICIPATE IN ANY CLASS, COLLECTIVE, OR REPRESENTATIVE ACTION. THIS IS DESCRIBED IN THE ARBITRATION AGREEMENT IN SECTION 24. YOU HAVE THE RIGHT TO OPT OUT OF THE ARBITRATION AGREEMENT WITHIN 30 DAYS AS DESCRIBED IN SECTION 24.",
+  },
+  {
+    type: "p",
+    caps: true,
+    text: "SAFERIDES IS A TECHNOLOGY PLATFORM. SAFERIDES DOES NOT PROVIDE TRANSPORTATION, DOES NOT OWN OR OPERATE VEHICLES, AND DOES NOT EMPLOY DRIVERS. DRIVERS ARE INDEPENDENT INDIVIDUALS WHO ARE NOT PROFESSIONALLY LICENSED OR PERMITTED CARRIERS. SAFERIDES DOES NOT PROVIDE INSURANCE COVERING RIDES. SEE SECTIONS 3 AND 12.",
+  },
+  {
+    type: "p",
+    text: "These Terms of Service (the “Terms”) are a legally binding agreement between you (“you,” “your,” or the “User”) and Coetzee Tech, Inc., a Delaware corporation doing business as SafeRides (“SafeRides,” “we,” “us,” or “our”). These Terms govern your access to and use of the SafeRides mobile application (the “App”), the SafeRides digital network and marketplace platform (the “Platform”), and all related content, features, and services (collectively, the “Services”).",
+  },
+  {
+    type: "p",
+    text: "These Terms apply to all Users of the Services within the United States, including both Riders who request Prearranged Rides and Drivers who provide them. Additional terms apply to Drivers under a separate Driver Agreement, and the handling of personal information is governed by the SafeRides Privacy Policy, each as described below and each incorporated into these Terms by reference.",
+  },
+  {
+    type: "p",
+    text: "By creating an account, accessing, or using the Services, you confirm that you have read, understood, and agree to be bound by these Terms. If you do not agree to these Terms, you may not access or use the Services. In these Terms, the words “include” and “including” mean “including, without limitation.”",
+  },
+];
+
+const TOC: string[] = [
+  "Acceptance, Scope, and Changes to These Terms",
+  "Definitions",
+  "The SafeRides Platform; Nature of the Services",
+  "Eligibility and Student Verification",
+  "Accounts and Registration",
+  "Safety Features, Background Checks, and Verification",
+  "Geofenced Service Areas",
+  "Communications and Consent",
+  "User Conduct and Responsibilities",
+  "Drivers and the Driver Agreement",
+  "Payment Terms",
+  "Insurance and Financial Responsibility",
+  "Nondiscrimination and Accessibility",
+  "Zero-Tolerance Drug and Alcohol Policy",
+  "User Content and Feedback",
+  "Intellectual Property; License; Restrictions",
+  "Third-Party Services, Links, and Content",
+  "Prohibited Activities",
+  "Disclaimers",
+  "Limitation of Liability",
+  "Indemnification",
+  "Records Maintenance",
+  "Term and Termination",
+  "Arbitration Agreement; Class Action Waiver",
+  "Governing Law and Forum",
+  "App Store Terms",
+  "Privacy",
+  "Notices",
+  "General Provisions",
+  "How to Contact Us",
+];
+
+const SECTIONS: Section[] = [
+  {
+    heading: "1. Acceptance, Scope, and Changes to These Terms",
+    blocks: [
+      { type: "h3", text: "Acceptance." },
+      { type: "p", text: "By accessing or using the Services, you agree to these Terms on your own behalf and, if you are using the Services on behalf of another person or entity, on their behalf, and you represent that you have the authority to do so." },
+      { type: "h3", text: "Supplemental terms." },
+      { type: "p", text: "Your use of the Services is also governed by additional policies that SafeRides makes available, which may include the SafeRides Privacy Policy, the Driver Agreement, community and safety standards, referral and promotional terms, the Nondiscrimination and Accessibility Policy, and the Zero-Tolerance Drug and Alcohol Policy (collectively, the “Supplemental Terms”). The Terms and the Supplemental Terms together are referred to as the “Agreement.” If any Supplemental Term conflicts with these Terms with respect to its specific subject matter, the Supplemental Term controls for that subject matter." },
+      { type: "h3", text: "Changes." },
+      { type: "p", text: "SafeRides may modify these Terms at any time. If we make changes, we will post the updated Terms within the Services or on our website and update the “Last Updated” date. Changes are effective when posted. Your continued use of the Services after changes become effective constitutes your acceptance of the updated Terms. You should review these Terms regularly." },
+      { type: "h3", text: "Termination by SafeRides." },
+      { type: "p", text: "SafeRides may, in its sole discretion and to the extent permitted by law, suspend, limit, or terminate your access to the Services, or cease offering the Services in whole or in part, at any time and for any reason, including for any violation of the Agreement." },
+    ],
+  },
+  {
+    heading: "2. Definitions",
+    blocks: [
+      {
+        type: "dl",
+        items: [
+          { term: "“User”", def: "means any person who accesses or uses the Services, including Riders and Drivers." },
+          { term: "“Rider”", def: "means a User who uses the Services to request, schedule, or receive a Prearranged Ride, and any person accompanying that User on the ride." },
+          { term: "“Driver” (or “Driving User”)", def: "means a User who uses the Services to offer or provide transportation to Riders as an independent individual." },
+          { term: "“Prearranged Ride”", def: "means the transportation of one or more Riders by a Driver that is arranged through the Services, beginning when a Driver accepts a Rider’s request through the App and continuing until the last Rider departs the Driver’s vehicle." },
+          { term: "“Trip”", def: "means any Prearranged Ride or any attempted Prearranged Ride that is canceled by a Rider or Driver before completion." },
+          { term: "“Charges”", def: "means the amounts payable by a Rider in connection with a Trip, including the fare, applicable taxes, tolls, and any fees or surcharges described in Section 11." },
+          { term: "“Service Fee”", def: "means the portion of the Charges that SafeRides retains for providing and maintaining the Services, as described in Section 11." },
+          { term: "“Geofenced Area”", def: "means the geographic boundaries within which SafeRides makes the Services available, as determined by SafeRides and as may be modified from time to time." },
+          { term: "“Pickup Code”", def: "means the four-digit verification code generated for a Prearranged Ride, as described in Section 6." },
+          { term: "“Driver Agreement”", def: "means the separate written agreement between SafeRides and each Driver that governs Driver eligibility, conduct, and obligations." },
+          { term: "“Privacy Policy”", def: "means the SafeRides Privacy Policy, which describes how SafeRides collects, uses, and discloses personal information." },
+          { term: "“SafeRides Marks”", def: "means the SafeRides name, logos, trademarks, service marks, and trade dress." },
+        ],
+      },
+    ],
+  },
+  {
+    heading: "3. The SafeRides Platform; Nature of the Services",
+    blocks: [
+      { type: "p", text: "The Services enable Riders to find, request, and arrange Prearranged Rides from independent Drivers within a verified student community, together with related features such as preference selection, payment processing, communications, and support. The Services are made available solely for your personal, non-commercial use unless otherwise agreed by SafeRides in writing." },
+      { type: "p", text: "When a Rider requests a Prearranged Ride, SafeRides notifies available Drivers that a request is available. It is up to the Driver to decide whether to accept a request, and up to the Rider to decide whether to accept a ride offered by a Driver. SafeRides does not guarantee that any Driver will accept a request or be available at any time or in any location." },
+      { type: "h3", text: "Technology provider only." },
+      { type: "p", text: "SafeRides provides a technology platform that connects Riders with independent Drivers. SafeRides does not itself provide transportation, does not own, lease, or operate any vehicles, and does not employ Drivers. Drivers are independent individuals and are not employees, actual agents, apparent agents, or ostensible agents of SafeRides. Drivers may offer peer-to-peer transportation and may not be professionally licensed or permitted carriers." },
+      { type: "h3", text: "No control over Drivers." },
+      { type: "p", text: "SafeRides does not control, direct, or manage Drivers or their vehicles, the routes they take, or the manner in which they operate. Any feature, standard, policy, verification, background check, or other measure that SafeRides undertakes in the interest of safety or quality—whether or not required by law—does not create an employment, agency, partnership, or joint-venture relationship between SafeRides and any Driver, and is not a representation or guarantee regarding any Driver." },
+      { type: "h3", text: "Payment collection agent." },
+      { type: "p", text: "SafeRides facilitates payment of Charges that a Rider owes to a Driver and collects those Charges on the Driver’s behalf solely as the Driver’s limited payment collection agent. Payment of the Charges through the Services is treated as payment made directly by the Rider to the Driver. SafeRides retains a Service Fee for providing the Services, as described in Section 11." },
+      { type: "h3", text: "Acknowledgment." },
+      { type: "p", text: "You acknowledge that the value SafeRides provides is the technology and marketplace that connects Riders and Drivers and the related services described in these Terms, and not the provision of transportation itself." },
+    ],
+  },
+  {
+    heading: "4. Eligibility and Student Verification",
+    blocks: [
+      { type: "h3", text: "Minimum age." },
+      { type: "p", text: "You must be at least eighteen (18) years of age, and the age of legal majority in your jurisdiction, to create an account or use the Services. The Services are not directed to, and may not be used by, anyone under 18." },
+      { type: "h3", text: "Capacity." },
+      { type: "p", text: "You may only use the Services if you have the legal capacity and authority to enter into a binding agreement with SafeRides and are not barred from using the Services under applicable law." },
+      { type: "h3", text: "Student verification." },
+      { type: "p", text: "Access to the Services is generally limited to members of participating campus communities. SafeRides may require you to register and verify your account using a valid university-issued email address (for example, a “.edu” address) or other method of identity or affiliation verification. SafeRides may deny, suspend, or revoke access if it is unable to verify your identity or affiliation." },
+      { type: "h3", text: "One account; no transfer." },
+      { type: "p", text: "You may maintain only one account, and you may not assign or transfer your account to any other person. You are responsible for all activity under your account and for maintaining the confidentiality and security of your account credentials. SafeRides may delete or deactivate duplicate accounts." },
+      { type: "h3", text: "Previously removed Users." },
+      { type: "p", text: "You may not register for or use the Services if you have previously been banned, suspended, or deactivated by SafeRides." },
+    ],
+  },
+  {
+    heading: "5. Accounts and Registration",
+    blocks: [
+      { type: "p", text: "To use most features of the Services, you must register for and maintain an active account (“Account”). When you register, you may be required to provide certain information, which may include your name, university email address, mobile phone number, date of birth, a photograph, and at least one valid payment method that you are authorized to use (“Account Information”). Drivers are required to provide additional information under the Driver Agreement, which may include driver’s license, vehicle, and insurance information." },
+      { type: "p", text: "You agree to provide accurate, current, and complete Account Information and to keep it updated. SafeRides may require you to provide proof of age, identity, or other verification, and may deny or restrict access if you do not provide it or if it cannot be verified." },
+      { type: "p", text: "You authorize your wireless carrier to use or disclose information about your account and device to SafeRides and its service providers, where available, solely to help verify your identity and prevent fraud." },
+      { type: "p", text: "SafeRides may disable or delete your Account if it remains unconfirmed or inactive for an extended period, if we suspect unauthorized use that we cannot resolve, or as required by law. To the maximum extent permitted by law, SafeRides assumes no liability for any resulting loss of access." },
+    ],
+  },
+  {
+    heading: "6. Safety Features, Background Checks, and Verification",
+    blocks: [
+      { type: "p", text: "SafeRides offers certain features intended to support the safety and trust of its community. These features are intended to reduce, but cannot eliminate, the risks inherent in transportation arranged between independent individuals." },
+      { type: "h3", text: "Student verification." },
+      { type: "p", text: "SafeRides restricts access to verified members of participating campus communities, as described in Section 4, to help foster a community of fellow students." },
+      { type: "h3", text: "Background checks." },
+      { type: "p", text: "SafeRides may require Drivers to undergo a background check and screening as a condition of providing rides. Background checks are performed by third-party providers. SafeRides does not independently verify, and does not represent or warrant, the accuracy, completeness, or reliability of any background check or screening, and the completion of a background check is not a guarantee of the safety, suitability, or conduct of any Driver." },
+      { type: "h3", text: "Pickup Code." },
+      { type: "p", text: "A four-digit Pickup Code is generated for each Prearranged Ride. The Pickup Code is shared with the Rider and the Driver and must be provided or confirmed before the ride begins. The Pickup Code is intended to help confirm that the Rider is entering the correct vehicle and that the Driver is picking up the correct Rider. Entry or confirmation of the Pickup Code may also be required to begin and to validate a Prearranged Ride, including for purposes of calculating Charges and Driver compensation." },
+      { type: "h3", text: "Ride preference matching." },
+      { type: "p", text: "Where SafeRides makes the feature available, a Rider may be able to indicate a preference to be matched with Drivers of a specified gender. Availability of any such preference depends on Driver supply within the Geofenced Area and is not guaranteed. This preference is a platform-level matching feature offered for Rider comfort and safety and does not authorize any User to refuse service in violation of the Nondiscrimination and Accessibility Policy in Section 13." },
+      { type: "h3", text: "Organization and group integrations." },
+      { type: "p", text: "SafeRides may offer features that integrate with student organizations, including fraternities, sororities, clubs, and other campus groups. Use of any such feature may involve sharing certain information with the relevant organization as described in the Privacy Policy." },
+      { type: "h3", text: "No guarantee." },
+      { type: "p", text: "While SafeRides implements the features described above, SafeRides cannot and does not guarantee the conduct, identity, or safety of any User. You are responsible for exercising your own judgment and ordinary care in your interactions with other Users." },
+    ],
+  },
+  {
+    heading: "7. Geofenced Service Areas",
+    blocks: [
+      { type: "p", text: "The Services are available only within designated Geofenced Areas, as determined by SafeRides in its sole discretion. SafeRides may modify, expand, or restrict any Geofenced Area at any time. Ride requests that begin or end outside a Geofenced Area may be unavailable or may be automatically canceled, and SafeRides is not responsible for any consequence of such unavailability." },
+    ],
+  },
+  {
+    heading: "8. Communications and Consent",
+    blocks: [
+      { type: "p", text: "By creating an Account, you agree to receive communications from SafeRides, from Drivers or Riders in connection with a Trip, and from third parties providing services to SafeRides. These communications may be delivered by email, text message, in-app message, push notification, and telephone call, including by automated telephone dialing systems and prerecorded or automated messages, to the phone number(s) and email address(es) associated with your Account. Message and data rates may apply. Message frequency varies based on your use of the Services." },
+      { type: "p", text: "Operational communications relate to your Account, your use of the Services, and your Trips, including ride requests, confirmations, Pickup Codes, and safety-related notices. You may also receive communications about features, promotions, or news." },
+      { type: "p", text: "You may manage your notification preferences in your Account settings. For help with SafeRides text messages at any time, reply “HELP” or contact us at saferideshelp@gmail.com. To stop receiving text messages from SafeRides, reply “STOP” from the device receiving the messages; you may continue to receive transactional messages necessary to the Services. You acknowledge that opting out of certain communications may affect your use of the Services." },
+      { type: "p", text: "Notwithstanding any opt-out, SafeRides may contact you regarding suspected fraud or unlawful activity." },
+    ],
+  },
+  {
+    heading: "9. User Conduct and Responsibilities",
+    blocks: [
+      { type: "p", text: "You agree to comply with all applicable laws when using the Services and to use the Services only for lawful purposes. You may not use the Services to cause nuisance, annoyance, inconvenience, harm, or damage to SafeRides, any Driver, any Rider, or any other party." },
+      { type: "p", text: "You are solely responsible for your interactions with other Users. You agree to treat other Users with respect and not to engage in conduct that is unlawful, threatening, abusive, harassing, discriminatory, or otherwise objectionable." },
+      { type: "h3", text: "Personal property and belongings." },
+      { type: "p", text: "You are responsible for your personal belongings during a Trip. SafeRides is not responsible for items lost, left behind, or damaged during a Trip, although SafeRides may attempt to assist with lost-item recovery as a courtesy as described in Section 11." },
+      { type: "h3", text: "Animals." },
+      { type: "p", text: "Subject to a Driver’s discretion and applicable law, a Rider may bring a small animal on a ride and is responsible for properly securing the animal and for any damage or mess it causes. Service animals are addressed in Section 13." },
+      { type: "h3", text: "Incident reporting." },
+      { type: "p", text: "To assist SafeRides with its safety, compliance, and recordkeeping efforts, you agree to notify SafeRides within twenty-four (24) hours of any accident, injury, or safety incident that occurs in connection with your use of the Services, to provide all reasonable information relating to the incident, and to cooperate with any investigation." },
+    ],
+  },
+  {
+    heading: "10. Drivers and the Driver Agreement",
+    blocks: [
+      { type: "p", text: "To provide transportation through the Services, a Driver must be at least eighteen (18) years of age, hold a valid driver’s license, maintain valid motor vehicle insurance as described in Section 12, meet SafeRides’ screening and eligibility requirements, and enter into and comply with a separate Driver Agreement. The Driver Agreement may impose additional requirements, and in the event of a conflict regarding Driver eligibility or conduct, the Driver Agreement controls." },
+      { type: "p", text: "Drivers are independent individuals and are not employees, agents, or representatives of SafeRides. A Driver has no authority to bind SafeRides and may not hold himself or herself out as an employee, agent, or representative of SafeRides. SafeRides does not, and shall not be deemed to, control a Driver or a Driver’s performance, including the Driver’s acts or omissions or the operation and maintenance of the Driver’s vehicle." },
+      { type: "p", text: "SafeRides may suspend, deactivate, or remove any Driver who fails to meet these requirements or who violates the Agreement, at any time and in its sole discretion." },
+    ],
+  },
+  {
+    heading: "11. Payment Terms",
+    blocks: [
+      { type: "h3", text: "Fares and Charges." },
+      { type: "p", text: "Your use of the Services as a Rider may result in Charges for the transportation you receive from a Driver. Charges may include the fare and may also include applicable taxes, estimated or actual tolls, cancellation fees, cleaning or repair fees, government-mandated fees, and other applicable surcharges. SafeRides will use reasonable efforts to inform you of Charges that may apply; you are responsible for Charges incurred under your Account regardless of your awareness of the amounts. SafeRides does not charge a fee for you to access or download the App." },
+      { type: "h3", text: "Service Fee and Driver Compensation." },
+      { type: "p", text: "Charges for a Prearranged Ride are owed by the Rider to the Driver. SafeRides collects those Charges from the Rider on the Driver’s behalf as the Driver’s limited payment collection agent. Of the fare collected for a completed Prearranged Ride, the Driver receives ninety percent (90%) and SafeRides retains ten percent (10%) as the Service Fee for providing and maintaining the Services. SafeRides may modify the Service Fee or establish or adjust other Charges prospectively, and will use reasonable efforts to communicate material changes." },
+      { type: "h3", text: "Estimated and Actual Fares." },
+      { type: "p", text: "The App may calculate and display an estimated fare for a Prearranged Ride before a Rider confirms the ride, based on factors such as the pickup location, destination, time of day, and applicable rates. Because actual conditions vary, the actual fare charged may differ from the estimate, including if the route, destination, duration, or distance changes during the Trip. By confirming a Prearranged Ride, you agree to pay the applicable Charges." },
+      { type: "h3", text: "Payment Methods and Authorization." },
+      { type: "p", text: "When you add a payment method, you authorize SafeRides and its payment service providers to collect and store your payment method information and to charge any payment method on file for Charges you incur. If your default payment method cannot be charged, you authorize SafeRides to charge another payment method on file. You authorize SafeRides to update payment method information obtained from financial partners where permitted by law, to correct erroneous charges, and to issue refunds. SafeRides may decline or limit any payment method it believes may be unauthorized, fraudulent, or otherwise to present unacceptable risk. Certain payment methods may involve third-party payment processors subject to their own terms and fees, for which SafeRides is not responsible." },
+      { type: "h3", text: "Pickup Code as a Condition." },
+      { type: "p", text: "Entry or confirmation of the Pickup Code may be required to begin and to validate a Prearranged Ride. SafeRides may rely on Pickup Code entry, together with trip data, to confirm that a ride occurred and to calculate the corresponding Charges and Driver compensation." },
+      { type: "h3", text: "Receipts." },
+      { type: "p", text: "Following the completion of a Prearranged Ride, SafeRides will make an electronic receipt available, which may include an itemization of the fare, the pickup location and destination, and the distance and duration of the Trip." },
+      { type: "h3", text: "Refunds and Cancellations." },
+      { type: "p", text: "Except as required by law or as otherwise determined by SafeRides and the Driver, Charges are final and non-refundable. If you wish to request a cancellation, refund, or correction of a Charge, you must do so through the Services within thirty (30) days after the Charge, after which SafeRides will have no further responsibility and you waive the right to dispute the amount. A cancellation fee may apply to canceled Trips as disclosed in the App." },
+      { type: "h3", text: "Promotions, Referrals, and Coupons." },
+      { type: "p", text: "SafeRides may, in its sole discretion, offer promotions, referral programs, and promotional credits or coupons, which may differ among Users and which SafeRides may modify, suspend, or withdraw at any time. Promotional credits and coupons have no cash value, are non-transferable, may be used only on the Services, and may not be combined unless expressly permitted." },
+      { type: "h3", text: "Tips." },
+      { type: "p", text: "A Rider may, at the Rider’s option, provide a voluntary tip to a Driver through the Services. Except for amounts a Rider provides as a tip, SafeRides does not designate any portion of the Charges as a tip. Tips are in addition to the fare, and SafeRides does not retain a Service Fee on tips." },
+      { type: "h3", text: "Damage, Cleaning, and Lost Items." },
+      { type: "p", text: "If a Rider causes damage to a Driver’s vehicle or property that requires repair or cleaning, SafeRides may charge the Rider a reasonable fee on the Driver’s behalf, the amount of which SafeRides determines in its reasonable discretion based on the type and severity of the damage, and may require supporting documentation. Such amounts, and amounts relating to recovered lost items, are non-refundable and may be transferred to the Driver. If a Rider believes an item was lost during a Trip, the Rider may contact SafeRides through the App, and SafeRides may attempt to coordinate its return as a courtesy." },
+      { type: "h3", text: "Taxes." },
+      { type: "p", text: "Charges include applicable taxes where required by law. You are responsible for any taxes that apply to your use of the Services other than taxes on SafeRides’ income." },
+    ],
+  },
+  {
+    heading: "12. Insurance and Financial Responsibility",
+    blocks: [
+      { type: "h3", text: "Driver insurance required." },
+      { type: "p", text: "Every Driver is required to maintain valid motor vehicle insurance that satisfies all applicable legal requirements for the operation of the Driver’s vehicle, and to maintain such coverage at all times while using the Services or providing a Prearranged Ride. Each Driver is solely responsible for determining whether the Driver’s own insurance policy provides coverage while the Driver uses the Services. Drivers must carry proof of insurance in the vehicle and provide it upon request." },
+      { type: "h3", text: "SafeRides provides no insurance." },
+      { type: "p", text: "SafeRides does not provide, and does not maintain, any insurance policy that covers a Driver, a Rider, a vehicle, or any Trip. SafeRides’ own policies, if any, will not and shall not provide coverage for any Driver, Rider, vehicle, or Trip." },
+      { type: "h3", text: "No duty to defend or indemnify." },
+      { type: "p", text: "Because Drivers are independent individuals and not employees or agents of SafeRides, SafeRides will not defend, indemnify, or pay any claim asserted against a Driver, and will not defend or indemnify any User, arising out of or relating to a Trip or the operation of any vehicle." },
+      { type: "h3", text: "Cooperation following an incident." },
+      { type: "p", text: "In the event of an accident or incident involving a Trip, the Driver and any involved User agree, upon request, to provide directly interested parties, insurers, and investigating authorities with relevant information, including proof of insurance and a statement of whether the Driver was using the Services or providing a Prearranged Ride at the time. Users agree to cooperate with SafeRides and with any insurer in connection with any investigation or claim." },
+      { type: "h3", text: "Rider acknowledgment." },
+      { type: "p", text: "You acknowledge and agree that Drivers are independent individuals who may offer peer-to-peer transportation and may not be professionally licensed or permitted, that the coverage available in connection with a Trip is the coverage maintained by the Driver and any applicable Rider, and that SafeRides bears no responsibility for the existence, sufficiency, or applicability of any insurance coverage relating to a Trip, to the maximum extent permitted by law." },
+    ],
+  },
+  {
+    heading: "13. Nondiscrimination and Accessibility",
+    blocks: [
+      { type: "p", text: "Every User must comply with this Nondiscrimination and Accessibility Policy." },
+      { type: "h3", text: "No discrimination." },
+      { type: "p", text: "No User who provides services through the Services may refuse to provide those services to a Rider, or to a prospective Rider, on the basis of race, color, national origin, religion, sex, gender, gender identity, age, sexual orientation, marital status, disability, medical condition, or any other characteristic protected under applicable law. SafeRides may suspend or deactivate any User found to have violated this Policy." },
+      { type: "h3", text: "Wheelchairs and mobility devices." },
+      { type: "p", text: "Where the Services support the feature, a Rider may indicate that the Rider requires a vehicle that can accommodate a wheelchair or other mobility device. Drivers are expected to transport Riders who use foldable wheelchairs, walkers, canes, crutches, or similar mobility devices so long as the device can be safely secured in the vehicle without interfering with safe operation, and to provide reasonable assistance upon request." },
+      { type: "h3", text: "Service animals." },
+      { type: "p", text: "Drivers may not refuse to transport a Rider accompanied by a service animal, and may not impose additional charges because of a service animal. SafeRides may suspend or deactivate any Driver found to have unlawfully refused service to a Rider with a service animal." },
+    ],
+  },
+  {
+    heading: "14. Zero-Tolerance Drug and Alcohol Policy",
+    blocks: [
+      { type: "p", text: "SafeRides maintains a zero-tolerance policy regarding the use of drugs or alcohol by Drivers while using the Services or providing a Prearranged Ride. If a Rider reasonably believes a Driver may be under the influence of drugs or alcohol during a Trip, the Rider should ask the Driver to end the Trip immediately and should report the incident to SafeRides through the App. SafeRides may suspend or deactivate any Driver who is the subject of a credible report of a violation pending investigation, and may permanently remove a Driver found to have violated this Policy." },
+    ],
+  },
+  {
+    heading: "15. User Content and Feedback",
+    blocks: [
+      { type: "p", text: "You may submit content through the Services, including profile information, photographs, ratings, reviews, and communications (“User Content”). You retain ownership of your User Content. By submitting User Content, you grant SafeRides a non-exclusive, worldwide, royalty-free, sublicensable, and transferable license to use, host, store, reproduce, modify, display, and distribute that User Content in connection with operating, providing, and improving the Services." },
+      { type: "p", text: "You are responsible for your User Content and represent that you have the rights necessary to submit it and that it does not violate the Agreement or the rights of any third party. You acknowledge that other Users may have access to information you choose to share, and SafeRides is not responsible for the use of information you disclose to other Users." },
+      { type: "p", text: "Any questions, comments, suggestions, ideas, or feedback you provide to SafeRides are non-confidential, and SafeRides may use them for any purpose without obligation or compensation to you." },
+    ],
+  },
+  {
+    heading: "16. Intellectual Property; License; Restrictions",
+    blocks: [
+      { type: "p", text: "The Services and all related intellectual property rights are and remain the property of SafeRides and its licensors. These Terms do not convey any rights in the Services or the SafeRides Marks except for the limited license expressly granted below." },
+      { type: "p", text: "Subject to your compliance with the Agreement, SafeRides grants you a limited, non-exclusive, non-sublicensable, non-transferable, and revocable license to access and use the App and the content made available through the Services on your personal device, solely for your personal, non-commercial use. All rights not expressly granted are reserved." },
+      { type: "p", text: "You may not, except as expressly permitted:" },
+      {
+        type: "ul",
+        items: [
+          "remove any proprietary notices from the Services;",
+          "reproduce, modify, prepare derivative works from, distribute, license, lease, sell, resell, transfer, publicly display, transmit, stream, or otherwise exploit the Services;",
+          "decompile, reverse engineer, or disassemble the Services, except as permitted by law;",
+          "link to, mirror, or frame any part of the Services;",
+          "use any automated means or process to access, scrape, or harvest data from the Services or any User’s account;",
+          "launch any program or script that unduly burdens or interferes with the Services; or",
+          "attempt to gain unauthorized access to, or impair, the Services or their related systems or networks.",
+        ],
+      },
+      { type: "p", text: "You may not use the SafeRides Marks without SafeRides’ prior written permission, except as incidental to your permitted use of the Services." },
+    ],
+  },
+  {
+    heading: "17. Third-Party Services, Links, and Content",
+    blocks: [
+      { type: "p", text: "The Services may enable access to, or contain links or references to, third-party services, websites, products, or content that are not owned or controlled by SafeRides (“Third-Party Services”). Third-Party Services are governed by their own terms and privacy policies, which differ from SafeRides’. SafeRides does not endorse and is not responsible or liable for any Third-Party Services or the acts or omissions of any third party. You access and use Third-Party Services at your own risk." },
+    ],
+  },
+  {
+    heading: "18. Prohibited Activities",
+    blocks: [
+      { type: "p", text: "When using the Services or while logged into your Account, you may not:" },
+      {
+        type: "ul",
+        items: [
+          "interfere with the operation of the Services; hack, decompile, or reverse engineer the Services; circumvent any security measure; or manipulate information transmitted through the Services, including to obfuscate its origin;",
+          "frame or mirror any part of the Services, or operate the Services in a manner that infringes the intellectual property or other rights of any third party;",
+          "violate any law or regulation, or use the Services in a manner that is fraudulent, abusive, harassing, threatening, discriminatory, defamatory, or obscene;",
+          "impersonate any person or entity, or provide false, inaccurate, or misleading information;",
+          "use the Services to request or provide transportation in exchange for payment outside the Services, or to solicit Users to transact outside the Services;",
+          "use any robot, spider, scraper, or other automated means to access, copy, or store information from the Services or any User’s account;",
+          "abuse, misuse, or use the Services in any manner not authorized under the Agreement; or",
+          "cause or induce any other person to do any of the foregoing.",
+        ],
+      },
+    ],
+  },
+  {
+    heading: "19. Disclaimers",
+    blocks: [
+      { type: "p", caps: true, text: "THE SERVICES ARE PROVIDED “AS IS” AND “AS AVAILABLE.” TO THE MAXIMUM EXTENT PERMITTED BY LAW, SAFERIDES DISCLAIMS ALL REPRESENTATIONS AND WARRANTIES, WHETHER EXPRESS, IMPLIED, OR STATUTORY, THAT ARE NOT EXPRESSLY SET OUT IN THESE TERMS, INCLUDING THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT." },
+      { type: "p", caps: true, text: "SAFERIDES MAKES NO REPRESENTATION, WARRANTY, OR GUARANTEE REGARDING THE RELIABILITY, TIMELINESS, QUALITY, SUITABILITY, SAFETY, OR AVAILABILITY OF THE SERVICES, OR THAT THE SERVICES WILL BE UNINTERRUPTED OR ERROR-FREE, FREE OF VIRUSES OR OTHER HARMFUL COMPONENTS, OR THAT ANY INFORMATION OR CONTENT AVAILABLE THROUGH THE SERVICES IS TRUE, RELIABLE, OR ACCURATE." },
+      { type: "p", caps: true, text: "SAFERIDES DOES NOT GUARANTEE THE QUALITY, SUITABILITY, SAFETY, ABILITY, OR CONDUCT OF ANY DRIVER, RIDER, OR OTHER USER, AND DOES NOT CONTROL, MANAGE, OR DIRECT ANY DRIVER. TO THE MAXIMUM EXTENT PERMITTED BY LAW, YOU AGREE THAT THE ENTIRE RISK ARISING OUT OF YOUR USE OF THE SERVICES, AND ANY TRANSPORTATION REQUESTED OR OBTAINED THROUGH THE SERVICES, REMAINS SOLELY WITH YOU." },
+      { type: "p", caps: true, text: "SAFERIDES’ USE OF BACKGROUND CHECKS, VERIFICATION, PICKUP CODES, ALGORITHMS, OR OTHER FEATURES IN AN EFFORT TO SUPPORT SAFETY OR IMPROVE THE EXPERIENCE OF USERS DOES NOT CONSTITUTE A GUARANTEE OR WARRANTY OF ANY KIND, EXPRESS OR IMPLIED." },
+    ],
+  },
+  {
+    heading: "20. Limitation of Liability",
+    blocks: [
+      { type: "p", caps: true, text: "TO THE MAXIMUM EXTENT PERMITTED BY LAW, SAFERIDES AND ITS AFFILIATES, AND THEIR RESPECTIVE OFFICERS, DIRECTORS, EMPLOYEES, AND AGENTS, SHALL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, PUNITIVE, OR CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS, LOST DATA, PERSONAL INJURY, DEATH, OR PROPERTY DAMAGE, ARISING OUT OF OR RELATING TO YOUR USE OF THE SERVICES, REGARDLESS OF THE NEGLIGENCE (WHETHER ACTIVE, PASSIVE, SOLE, OR CONCURRENT) OF SAFERIDES, AND EVEN IF SAFERIDES HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES." },
+      { type: "p", caps: true, text: "TO THE MAXIMUM EXTENT PERMITTED BY LAW, SAFERIDES SHALL NOT BE LIABLE FOR ANY DAMAGES, LIABILITY, OR LOSSES ARISING OUT OF: (A) YOUR USE OF OR INABILITY TO ACCESS OR USE THE SERVICES; (B) ANY TRANSACTION, RELATIONSHIP, OR INTERACTION BETWEEN YOU AND ANY DRIVER, RIDER, OR OTHER THIRD PARTY, INCLUDING THE ACTS OR OMISSIONS OF ANY USER; OR (C) THE CONDUCT, PERFORMANCE, SUITABILITY, OR INSURANCE OF ANY USER. YOU ACKNOWLEDGE THAT DRIVERS MAY OFFER PEER-TO-PEER TRANSPORTATION AND MAY NOT BE PROFESSIONALLY LICENSED OR PERMITTED." },
+      { type: "p", caps: true, text: "SAFERIDES SHALL NOT BE LIABLE FOR ANY DELAY OR FAILURE IN PERFORMANCE RESULTING FROM CAUSES BEYOND ITS REASONABLE CONTROL." },
+      { type: "p", text: "Nothing in these Terms excludes or limits any liability that cannot be excluded or limited under applicable law, including liability for gross negligence, willful misconduct, or fraud where such liability cannot lawfully be limited, and nothing in these Terms limits any right or remedy you may have under applicable law that cannot lawfully be waived. Because some jurisdictions do not allow the exclusion or limitation of certain damages, some of the above limitations may not apply to you, and you may have additional rights. This provision does not affect the Governing Law provision in Section 25 or your rights under Section 24." },
+    ],
+  },
+  {
+    heading: "21. Indemnification",
+    blocks: [
+      { type: "p", text: "To the maximum extent permitted by law, you agree to indemnify, defend, and hold harmless SafeRides and its affiliates, and their respective officers, directors, employees, and agents (collectively, the “Indemnified Parties”), from and against any and all claims, actions, demands, losses, liabilities, costs, damages, and expenses (including reasonable attorneys’ fees) arising out of or relating to: (a) your use of the Services or the transportation or other services you receive or provide through the Services; (b) your breach or violation of the Agreement; (c) SafeRides’ use of your User Content; (d) your violation of the rights of any third party, including any Driver, Rider, or other User; or (e) if you are a Driver, your operation of your vehicle and your provision of any Trip. You will not settle any claim affecting an Indemnified Party without that party’s prior written consent." },
+    ],
+  },
+  {
+    heading: "22. Records Maintenance",
+    blocks: [
+      { type: "p", text: "To support its safety, compliance, insurance, and recordkeeping efforts, SafeRides may retain records relating to Trips, Transactions, Users, and reported incidents. Such records may include trip date and time, pickup location and destination, distance and duration, fare and means of payment, communications between Users made through the Services, ratings, and any reports, complaints, or feedback submitted to SafeRides. SafeRides may retain records relating to reports of alleged violations of its policies, and records relating to Drivers and Trips, for the periods it determines are appropriate or as required by law." },
+    ],
+  },
+  {
+    heading: "23. Term and Termination",
+    blocks: [
+      { type: "p", text: "The Agreement is effective when you first access or use the Services and continues until terminated. You may terminate the Agreement at any time by ceasing all use of the Services and, if applicable, closing your Account, including through the App." },
+      { type: "p", text: "SafeRides may suspend, deactivate, or terminate your Account or access to the Services, in whole or in part, at any time and for any reason to the extent permitted by law, including if: (a) you cease to qualify as an eligible User; (b) you, or if you are a Driver your vehicle, cannot qualify under applicable law or any applicable insurance policy; (c) you violate the Agreement or applicable law; or (d) your conduct interferes with or harms other Users or the Services. SafeRides may, but is not required to, provide a period during which you may attempt to cure an alleged breach." },
+      { type: "p", text: "Sections of these Terms that by their nature should survive termination will survive, including the definitions and the provisions regarding intellectual property, your license grant of User Content, disclaimers, limitation of liability, indemnification, records maintenance, arbitration, governing law, and the general provisions." },
+    ],
+  },
+  {
+    heading: "24. Arbitration Agreement; Class Action Waiver",
+    blocks: [
+      { type: "p", text: "This Section 24 is the “Arbitration Agreement.” Please read it carefully. It affects your rights." },
+      { type: "h3", text: "Agreement to Arbitrate." },
+      { type: "p", text: "Except for the matters described under “Exceptions” below, you and SafeRides agree that any dispute, claim, or controversy arising out of or relating to the Agreement, the Services, your relationship with SafeRides, or any incident, injury, or accident alleged to have occurred in connection with your use of the Services, whether arising before or after the date you agreed to these Terms, will be resolved exclusively by final and binding individual arbitration, and not in a court of law. This Arbitration Agreement survives termination of your relationship with SafeRides." },
+      { type: "h3", text: "Class Action Waiver." },
+      { type: "p", text: "You and SafeRides agree that each may bring claims against the other only in an individual capacity, and not as a plaintiff or class member in any purported class, collective, coordinated, consolidated, mass, or representative proceeding. The arbitrator may not consolidate or join the claims of more than one person and may not award relief to anyone other than the individual party in arbitration, except as provided under “Mass Action Waiver and Batching.” If a court decides that this Class Action Waiver is unenforceable as to a particular claim, that claim, and only that claim, must proceed in court, and all other claims must proceed in arbitration." },
+      { type: "h3", text: "Mass Action Waiver and Batching." },
+      { type: "p", text: "You and SafeRides agree that neither will bring or participate in a “Mass Action,” meaning circumstances in which a party is represented by a law firm or group of firms that files 50 or more arbitration demands of a substantially similar nature against the other party within a 180-day period and seeks to administer them collectively. If 50 or more such demands are filed, the demands will be administered in sequential batches of no more than 100 demands per batch, grouped by state of residence and then alphabetically by last name, with one arbitrator and one set of fees per batch, and only one batch proceeding at a time. The arbitrator has authority to determine whether a party has violated the Mass Action Waiver. You agree to cooperate in good faith with this batching process, which is intended to increase the efficiency of resolution." },
+      { type: "h3", text: "Delegation." },
+      { type: "p", text: "The arbitrator, and not any court, has exclusive authority to resolve any dispute relating to the interpretation, applicability, enforceability, or formation of this Arbitration Agreement, including any claim that all or part of it is void or voidable, and any threshold question of arbitrability. However, only a court, and not an arbitrator, may decide disputes relating to the enforceability of the Class Action Waiver and the Mass Action Waiver, except that the arbitrator may decide whether a party has violated the Mass Action Waiver as described above." },
+      { type: "h3", text: "Exceptions." },
+      { type: "p", text: "This Arbitration Agreement does not require arbitration of: (a) individual claims brought in small claims court, so long as the matter remains in that court and proceeds only on an individual basis; (b) individual claims of sexual assault or sexual harassment alleged to have occurred in connection with your use of the Services, which you may elect to bring in a court of competent jurisdiction consistent with applicable law, including the Ending Forced Arbitration of Sexual Assault and Sexual Harassment Act; and (c) requests for injunctive or other equitable relief to prevent the actual or threatened infringement, misappropriation, or violation of a party’s intellectual property rights. Any such claims permitted in court must still be brought on an individual basis, consistent with the Class Action Waiver, except as otherwise required by applicable law." },
+      { type: "h3", text: "Informal Dispute Resolution." },
+      { type: "p", text: "Before initiating arbitration, the party raising a claim must first provide written notice of the dispute to the other party and the parties must attempt in good faith to resolve the claim informally through a telephone or video conference within sixty (60) days after notice is received. Notice to SafeRides must be sent to saferideshelp@gmail.com and must include your name, the phone number and email associated with your Account, and a description of the claim. Completion of this informal process is a condition to commencing arbitration, and the applicable limitations period and any filing-fee deadlines are tolled while the parties engage in it." },
+      { type: "h3", text: "Rules, Provider, and Governing Law." },
+      { type: "p", text: "This Arbitration Agreement evidences a transaction involving interstate commerce, and the Federal Arbitration Act governs its interpretation and enforcement. For disputes arising in South Carolina, the arbitration will be administered by a neutral, established arbitration provider with operations in South Carolina, such as ADR Services, Inc. or the American Arbitration Association, under the provider’s applicable consumer rules in effect when the claim is brought, before a single arbitrator. For disputes arising outside South Carolina, the parties will meet and confer to select a neutral provider with operations in the state where the dispute arises, and if they cannot agree, either party may ask a court to appoint one under 9 U.S.C. § 5. The arbitrator will be a retired judge or an attorney licensed in the state where the arbitration is conducted with relevant experience. Claims relating to personal injury or death alleged to have occurred in connection with the Services will be governed by the law of the state where the incident occurred." },
+      { type: "h3", text: "Costs and Fees." },
+      { type: "p", text: "Your responsibility to pay any filing, administrative, or arbitrator fees will be as set forth in the applicable provider’s rules, and will not exceed the amount you would pay to file the claim in court. If you demonstrate that the costs of arbitration would be prohibitive compared to litigation, SafeRides will pay as much of your filing and hearing fees as the arbitrator determines is necessary to prevent the arbitration from being cost-prohibitive. Each party is otherwise responsible for its own costs except as the arbitrator determines or as the provider’s rules or applicable law require." },
+      { type: "h3", text: "Your Right to Opt Out." },
+      { type: "p", text: "You may opt out of this Arbitration Agreement within thirty (30) days after you first accept these Terms by sending written notice of your decision to opt out to saferideshelp@gmail.com, including your name and the email and phone number associated with your Account. The notice must come from you and not from any agent or representative. Opting out of this Arbitration Agreement will not affect any other part of these Terms and will not affect any prior arbitration agreement between you and SafeRides." },
+      { type: "h3", text: "Severability and Survival." },
+      { type: "p", text: "If any portion of this Arbitration Agreement (other than the Class Action Waiver or Mass Action Waiver) is found to be unenforceable, that portion will be severed and the remainder will be enforced. This Arbitration Agreement survives termination of the Agreement and your relationship with SafeRides." },
+    ],
+  },
+  {
+    heading: "25. Governing Law and Forum",
+    blocks: [
+      { type: "p", text: "Except as otherwise provided in the Arbitration Agreement, these Terms are governed by the laws of the State of South Carolina, without regard to its conflict-of-laws principles. This choice of law applies only to the interpretation of these Terms and does not extend any state’s law to you if your dispute did not arise in that state." },
+      { type: "p", text: "Subject to the Arbitration Agreement, any dispute not subject to arbitration will be brought exclusively in the state or federal courts located in South Carolina, and you consent to the personal jurisdiction of those courts. Notwithstanding the foregoing, any claim relating to personal injury or death (including any claim of sexual assault or harassment) alleged to have occurred in connection with your use of the Services will be governed by the law of, and may be brought in the courts of, the state where the incident occurred, to the extent permitted by law." },
+    ],
+  },
+  {
+    heading: "26. App Store Terms",
+    blocks: [
+      { type: "p", text: "The availability of the App may depend on the app store from which you obtained it, such as the Apple App Store (the “App Store”). These Terms are between you and SafeRides, and not with the App Store, and SafeRides is responsible for the Services as described in these Terms. If you obtained the App from the Apple App Store, Apple Inc. and its subsidiaries are third-party beneficiaries of these Terms and have the right to enforce them against you. These Terms incorporate Apple’s Licensed Application End User License Agreement; in the event of a conflict, these Terms control to the extent permitted." },
+    ],
+  },
+  {
+    heading: "27. Privacy",
+    blocks: [
+      { type: "p", text: "Your privacy is important to SafeRides. The SafeRides Privacy Policy describes how SafeRides collects, uses, stores, discloses, and protects your personal information, and is incorporated into these Terms by reference. By using the Services, you acknowledge the collection, use, and disclosure of your information as described in the Privacy Policy." },
+      { type: "p", text: "As described more fully in the Privacy Policy, the information SafeRides collects may include the information you provide at registration (such as your name, university email, phone number, date of birth, photograph, and payment information), additional information from Drivers (such as driver’s license, vehicle, and insurance information), information collected when you use the Services (including device information, location information, and ride information such as pickup and destination locations, routes, and trip data), and information from third parties such as background-check, verification, and fraud-prevention providers. SafeRides uses this information to operate, provide, secure, and improve the Services, to verify Users, to facilitate and process Trips and payments, to support safety and investigations, to provide customer support and communications, and to comply with legal obligations." },
+    ],
+  },
+  {
+    heading: "28. Notices",
+    blocks: [
+      { type: "p", text: "SafeRides may provide notices to you through the Services, by email or text to the contact information associated with your Account, or by mail. Notices are deemed given when sent (if by email, text, or through the Services) or, if by mail, upon the expiration of 48 hours after mailing. Notices to SafeRides must be sent to the addresses below. You are solely responsible for keeping your contact information current." },
+      { type: "p", text: "Coetzee Tech, Inc. (d/b/a SafeRides), 214 S Gregg Street, Columbia, SC 29205. Email: saferideshelp@gmail.com. Registered agent (Delaware): Legalinc Corporate Services Inc., 131 Continental Dr, Suite 305, Newark, DE 19713." },
+    ],
+  },
+  {
+    heading: "29. General Provisions",
+    blocks: [
+      { type: "h3", text: "Entire agreement." },
+      { type: "p", text: "The Agreement is the entire agreement between you and SafeRides regarding the Services and supersedes all prior or contemporaneous understandings and agreements, whether written or oral, on the subject. No promises have been made to you other than those stated in the Agreement." },
+      { type: "h3", text: "Severability." },
+      { type: "p", text: "If any provision of the Agreement is held invalid or unenforceable, the remaining provisions will remain in full force and effect, and the invalid or unenforceable provision will be replaced with a valid provision that most closely reflects its intent." },
+      { type: "h3", text: "Assignment." },
+      { type: "p", text: "You may not assign or transfer the Agreement without SafeRides’ prior written consent. SafeRides may assign the Agreement, in its sole discretion and to the extent permitted by law, by providing notice to you." },
+      { type: "h3", text: "Relationship of the parties." },
+      { type: "p", text: "The Agreement does not create any employment, agency, partnership, joint-venture, or fiduciary relationship between you and SafeRides. As between SafeRides and a Driver, the Driver is an independent individual and not an employee or agent of SafeRides." },
+      { type: "h3", text: "No waiver." },
+      { type: "p", text: "A party’s failure to enforce any provision of the Agreement is not a waiver of its right to do so later. Any waiver must be in writing." },
+      { type: "h3", text: "Headings." },
+      { type: "p", text: "Headings are for reference only and do not define, limit, or describe the scope of any provision." },
+      { type: "h3", text: "Limitation period." },
+      { type: "p", text: "To the extent permitted by law, any claim arising out of or relating to the Agreement or the Services must be filed within two (2) years after the claim accrues, or it is permanently barred." },
+      { type: "h3", text: "Force majeure." },
+      { type: "p", text: "SafeRides will not be liable for any delay or failure to perform resulting from causes beyond its reasonable control, including natural disasters, acts of God, labor disputes, war, government action, epidemics or pandemics, strikes, riots, acts of terrorism, quarantines, and emergencies." },
+      { type: "h3", text: "Electronic communications." },
+      { type: "p", text: "You consent to receive communications and to transact with SafeRides electronically, and you agree that electronic agreements, notices, disclosures, and other communications satisfy any legal requirement that they be in writing." },
+      { type: "h3", text: "Survival." },
+      { type: "p", text: "Provisions that by their nature should survive termination of the Agreement will survive." },
+    ],
+  },
+  {
+    heading: "30. How to Contact Us",
+    blocks: [
+      { type: "p", text: "If you have questions about these Terms or the Services, please contact SafeRides at saferideshelp@gmail.com." },
+      { type: "p", text: "By using the SafeRides Services, you acknowledge that you have read, understood, and agree to these Terms of Service." },
+    ],
+  },
+];
+
+function renderBlock(block: Block, key: number) {
+  switch (block.type) {
+    case "h3":
+      return (
+        <h3 key={key} className="text-lg font-semibold text-[#1A1A1A] mt-6 mb-2">
+          {block.text}
+        </h3>
+      );
+    case "p":
+      return (
+        <p
+          key={key}
+          className={`text-[#1A1A1A] mb-3${block.caps ? " font-semibold" : ""}`}
+        >
+          {block.text}
+        </p>
+      );
+    case "ul":
+      return (
+        <ul key={key} className="list-disc list-inside space-y-1 text-[#1A1A1A] mb-3">
+          {block.items.map((item, i) => (
+            <li key={i}>{item}</li>
+          ))}
+        </ul>
+      );
+    case "dl":
+      return (
+        <div key={key} className="space-y-2 mb-3">
+          {block.items.map((item, i) => (
+            <p key={i} className="text-[#1A1A1A]">
+              <strong>{item.term}</strong> {item.def}
+            </p>
+          ))}
+        </div>
+      );
+    default:
+      return null;
+  }
 }
 
 const Terms = () => {
-  const [legalContent, setLegalContent] = useState<LegalContentState>({
-    content: "",
-    loading: true,
-  });
-
   useEffect(() => {
     document.title = "Terms of Service - SafeRides";
-
-    let cancelled = false;
-
-    async function loadTerms() {
-      try {
-        const content = await loadLegalField("termsContent");
-        if (!cancelled) setLegalContent({ content, loading: false });
-      } catch (error) {
-        console.error("Failed to load Terms from Firestore:", error);
-        if (!cancelled) setLegalContent({ content: "", loading: false });
-      }
-    }
-
-    void loadTerms();
-    return () => {
-      cancelled = true;
-    };
   }, []);
 
   return (
@@ -50,177 +497,38 @@ const Terms = () => {
       <main>
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
           <header className="mb-8">
-            <h1 className="text-2xl font-bold text-gray-900">SafeRides™ Terms of Service</h1>
+            <h1 className="text-2xl font-bold text-[#1A1A1A]">
+              SafeRides™ Terms of Service
+            </h1>
+            <p className="text-sm text-[#6B7280] mt-2">
+              For the Students, by the Students. Coetzee Tech, Inc. (d/b/a
+              SafeRides) • Effective Date: June 1, 2026 • Last Updated: July 21,
+              2026
+            </p>
           </header>
+
           <div className="space-y-6 text-sm leading-relaxed">
-            {legalContent.loading ? (
-              <div className="py-12 text-center text-gray-700">Loading...</div>
-            ) : legalContent.content ? (
-              legalContent.content.startsWith("<") ? (
-                <div dangerouslySetInnerHTML={{ __html: legalContent.content }} />
-              ) : (
-                <p className="text-gray-700" style={{ whiteSpace: "pre-wrap" }}>
-                  {legalContent.content}
-                </p>
-              )
-            ) : (
-              <>
-            <p className="text-gray-700"><strong>IMPORTANT: PLEASE BE ADVISED THAT BY AGREEING TO THESE TERMS YOU ARE WAIVING YOUR RIGHT TO SEEK RELIEF IN A COURT OF LAW AND WAIVING YOUR RIGHT TO HAVE A JURY TRIAL ON YOUR CLAIMS.</strong></p>
-            <p className="text-gray-700" style={{ fontSize: "0.85em", lineHeight: 1.6 }}>PLEASE READ THESE TERMS OF SERVICE CAREFULLY AS THEY CONTAIN PROVISIONS THAT GOVERN HOW YOU CAN BRING CLAIMS BETWEEN YOU AND SAFERIDES™, INCLUDING THE ARBITRATION AGREEMENT IN SECTION 2 BELOW. THE ARBITRATION AGREEMENT REQUIRES YOU TO RESOLVE ALL DISPUTES WITH SAFERIDES™ ON AN INDIVIDUAL BASIS AND, WITH LIMITED EXCEPTIONS, THROUGH FINAL AND BINDING ARBITRATION. THESE TERMS OF SERVICE OUTLINE HOW SUCH CLAIMS ARE RESOLVED, INCLUDING, WITHOUT LIMITATION, ANY CLAIMS THAT AROSE OR WERE ASSERTED BEFORE THE EFFECTIVE DATE OF THESE TERMS OF SERVICE. BY AGREEING TO THESE TERMS OF SERVICE, YOU EXPRESSLY ACKNOWLEDGE THAT YOU HAVE READ AND UNDERSTOOD ALL OF THEM AND HAVE TAKEN TIME TO CONSIDER THE CONSEQUENCES OF THIS IMPORTANT DECISION.</p>
-            <p className="text-gray-700">These Terms of Service (“Terms of Service”) constitute a legally binding agreement between you and SafeRides™ Technologies, Inc. and its subsidiaries, representatives, affiliates, officers and directors (collectively, “SafeRides™”) governing your use of SafeRides™’ personalized, multipurpose, digital marketplace platform (“SafeRides™ Marketplace Platform”) and any related content or services, including but not limited to mobile and/or web-based applications (“Applications” or the “SafeRides™ App,” and together with the SafeRides™ Marketplace Platform, the “Services”).</p>
-            <p className="text-gray-700">Notwithstanding the foregoing, if you choose, now or in the future, to provide transportation (e.g., ride-hailing, ridesharing and commercial transportation), these Terms of Service do not supersede or otherwise impact the enforceability of any agreements you may have with SafeRides™ or its subsidiaries regarding such Third-Party Services (e.g., the Platform Access Agreement, the Technology Services Agreement and/or any similar agreements). To the extent (but only to the extent) any agreement you may have with SafeRides™ regarding Third-Party Services you provide conflicts with these Terms of Service, those agreements (and not these Terms of Service) will prevail with respect to any disputes arising from your provision of Third-Party Services; otherwise, any relevant provisions in these Terms of Service apply.</p>
-            <h2 className="text-xl font-semibold text-gray-900 mt-8 mb-3">1. Contractual Relationship; Termination; and Modification</h2>
-            <p className="text-gray-700">In addition to these Terms of Service, your access to, and use of the Services is also governed by the applicable terms found on our website. These include but are not limited to: the Privacy Notice, which describes how we collect, use, and disclose your personal information; the User Generated Content Terms; Community Guidelines; Referral Policies; the ADT Mobile Security Monitoring Terms and SafeRides™’ other applicable SafeRides™ standards and policies (including, without limitation, SafeRides™’ safety standards, the accessibility policies, and the U.S. Service Animal Policy), which we refer to collectively as the “Supplemental Terms.”</p>
-            <p className="text-gray-700">Collectively, we refer to these Terms of Service and the Supplemental Terms as the “Terms.” These Terms govern your access or use, from within the United States and its territories and possessions, of the Services made available in the United States and its territories and possessions (the “Territory”). If you use the Services in another country, you agree to be subject to SafeRides™’ terms of service for that country. In these Terms, the words “including” and "include” mean “including, but not limited to.”</p>
-            <p className="text-gray-700">By accessing or using the Services, you confirm your agreement to be bound by these Terms. If you do not agree to these Terms, do not access or use the Services.</p>
-            <h3 className="text-lg font-semibold text-gray-900 mt-6 mb-2">Termination.</h3>
-            <p className="text-gray-700">SafeRides™, in its sole discretion, may immediately terminate these Terms or any Services with respect to you, or generally cease offering or deny access to the Services or any portion thereof, at any time for any reason.</p>
-            <h3 className="text-lg font-semibold text-gray-900 mt-6 mb-2">Modification.</h3>
-            <p className="text-gray-700">SafeRides™ reserves the right to modify these Terms or its policies relating to the Services at any time, effective upon posting of an updated version of these Terms through the Services or SafeRides™’ website. You should regularly review these Terms, as your continued use of the Services after any such changes constitutes your agreement to such changes.</p>
-            <h2 className="text-xl font-semibold text-gray-900 mt-8 mb-3">2. Arbitration Agreement</h2>
-            <p className="text-gray-700">By agreeing to these Terms, you agree that you are required to resolve any claim that you may have against SafeRides™ on an individual basis in binding arbitration as set forth in this Arbitration Agreement, and not as a class, collective, coordinated, consolidated, mass and/or representative action. Binding arbitration is a procedure in which a dispute is submitted to one or more arbitrators who make a binding decision on the dispute. In choosing binding arbitration, you and SafeRides™ are opting for a private dispute resolution procedure where you agree to accept the arbitrator’s decision as final instead of going to court. You and SafeRides™ are each waiving your right to a jury trial.</p>
-            <p className="text-gray-700">This Arbitration Agreement will preclude you from bringing any class, collective, coordinated, consolidated, mass, and/or representative action against SafeRides™, and also preclude you from participating in or recovering relief in any current or future class, collective, coordinated, consolidated, mass and/or representative action brought against SafeRides™ by someone else—except as provided below in Section 2(a)(3)(c). Thus, the parties agree that the Arbitrator shall not conduct any form of class, collective, coordinated, consolidated, mass, and/or representative arbitration, nor join, coordinate, or consolidate claims of multiple individuals against SafeRides™ in a single proceeding—except as provided below in Section 2(a)(3)(c). For the avoidance of doubt, except as provided below in Section 2(a)(3)(c), this Arbitration Agreement precludes you from bringing or participating in any kind of class, collective, coordinated, consolidated, mass, and/or representative or other kind of group, multi-plaintiff or joint action against SafeRides™, other than participating in a classwide, collective, coordinated, consolidated, mass, and/or representative settlement of claims.</p>
-            <h3 className="text-lg font-semibold text-gray-900 mt-6 mb-2">(a) Agreement to Binding Arbitration Between You and SafeRides™.</h3>
-            <h3 className="text-lg font-semibold text-gray-900 mt-6 mb-2">(1) Covered Disputes:</h3>
-            <p className="text-gray-700">Except as expressly provided below in Section 2(b), you and SafeRides™ agree that any dispute, claim, or controversy in any way arising out of or relating to (i) these Terms and prior versions of these Terms, or the existence, breach, termination, enforcement, interpretation, scope, waiver, or validity thereof; (ii) your access to or use of the Services at any time; (iii) incidents or accidents resulting in personal injury or death to you or anyone else that you allege occurred in connection with your use of the Services (including, but not limited to, your use of the SafeRides™ Marketplace Platform or the driver version of the SafeRides™ App), regardless of whether the dispute, claim, or controversy occurred or accrued before or after the date you agreed to these Terms, and regardless of whether you allege that the personal injury or death was experienced by you or anyone else; and (iv) your relationship with SafeRides™, will be settled by binding individual arbitration between you and SafeRides™, and not in a court of law. This Arbitration Agreement survives after your relationship with SafeRides™ ends.</p>
-            <h3 className="text-lg font-semibold text-gray-900 mt-6 mb-2">(2) Class Action Waiver:</h3>
-            <p className="text-gray-700">Any and all disputes, claims, or controversies between the parties shall be resolved only in individual arbitration. The parties expressly waive the right to have any dispute, claim, or controversy brought, heard, administered, resolved, or arbitrated as a class, collective, coordinated, consolidated, and/or representative action, and neither an arbitrator nor an arbitration provider shall have any authority to hear, arbitrate, or administer any class, collective, coordinated, consolidated, and/or representative action, or to award relief to anyone but the individual in arbitration. The parties also expressly waive the right to seek, recover, or obtain any non-individual relief. Notwithstanding anything else in this agreement, this Class Action Waiver does not prevent you or SafeRides™ from participating in a classwide, collective, and/or representative settlement of claims.</p>
-            <p className="text-gray-700">The parties further agree that if for any reason a claim does not proceed in arbitration, this Class Action Waiver shall remain in effect, and a court may not preside over any action joining, coordinating, or consolidating the claims of multiple individuals against SafeRides™ in a single proceeding, except that this Class Action Waiver shall not prevent you or SafeRides™ from participating in a classwide, collective, and/or representative settlement of claims. If there is a final judicial determination that any portion of this Class Action Waiver is unenforceable or unlawful for any reason, (i) any class, collective, coordinated, consolidated, and/or representative claims subject to the unenforceable or unlawful portion(s) shall proceed in a court of competent jurisdiction; (ii) the portion of the Class Action Waiver that is enforceable shall be enforced in arbitration; (iii) the unenforceable or unlawful portion(s) shall be severed from this Arbitration Agreement; and (iv) severance of the unenforceable or unlawful portion(s) shall have no impact whatsoever on the enforceability, applicability, or validity of the Arbitration Agreement or the arbitrability of any remaining claims asserted by you or SafeRides™.</p>
-            <h3 className="text-lg font-semibold text-gray-900 mt-6 mb-2">(3) Mass Actions:</h3>
-            <h4 className="text-base font-semibold text-gray-800 mt-4 mb-2">a. Mass Action Waiver:</h4>
-            <p className="text-gray-700">Any and all disputes, claims, or controversies between the parties shall be resolved only in individual arbitration. The parties expressly waive the right to have any dispute, claim, or controversy brought, heard, administered, resolved, or arbitrated as a mass action, and neither an arbitrator nor an arbitration provider shall have any authority to hear, arbitrate, or administer any mass action or to award relief to anyone but the individual in arbitration—except as provided below in Section 2(a)(3)(c). The parties also expressly waive the right to seek, recover, or obtain any non-individual relief. The parties agree that the definition of a “Mass Action” includes, but is not limited to, instances in which you or SafeRides™ are represented by a law firm or collection of law firms that has filed 50 or more arbitration demands of a substantially similar nature against the other party within 180 days of the arbitration demand filed on your or SafeRides™’s behalf, and the law firm or collection of law firms seeks to simultaneously or collectively administer and/or arbitrate all the arbitration demands in the aggregate. Notwithstanding anything else in this agreement, this Mass Action Waiver does not prevent you or SafeRides™ from participating in a mass settlement of claims.</p>
-            <h4 className="text-base font-semibold text-gray-800 mt-4 mb-2">b. Dispute Procedure:</h4>
-            <p className="text-gray-700">Notwithstanding any provision to the contrary in the applicable arbitration provider’s rules, the arbitrator shall be empowered to determine whether the party bringing any claim has filed a Mass Action in violation of the Mass Action Waiver. Either party shall raise with the arbitrator or arbitration provider such a dispute within 15 days of its arising. If such a dispute arises before an arbitrator has been appointed, the parties agree that (i) a panel of three arbitrators shall be appointed to resolve only disputes concerning whether the party bringing any claim has filed a Mass Action in violation of the Mass Action Waiver. Each party shall select one arbitrator from the arbitration provider’s roster to serve as a neutral arbitrator, and these arbitrators shall appoint a third neutral arbitrator. If the parties’ arbitrators cannot agree on a third arbitrator, the arbitration provider will select the third arbitrator; (ii) SafeRides™ shall pay any administrative fees or costs incidental to the appointment of Arbitrators under this provision, as well as any fees or costs that would not be incurred in a court proceeding, such as payment of the fees of the arbitrators, as well as room rental; (iii) the arbitrators shall issue a written decision with findings of fact and conclusions of law; and (iv) any further arbitration proceedings or assessment of arbitration-related fees shall be stayed pending the arbitrators’ resolution of the parties’ dispute. If the arbitrator or panel of arbitrators determines that you have violated the Mass Action Waiver, the parties shall have the opportunity to opt out of arbitration within 30 days of the arbitrator’s or panel of arbitrator’s decision. You may opt out of arbitration by providing written notice of your intention to opt out to the arbitration provider and to SafeRides™, to email saferideshelp@gmail.com. This written notice must be signed by you, and not any attorney, agent, or other representative of yours. SafeRides™ may opt out of arbitration by sending written notice of its intention to opt out to the arbitration provider and to you or your attorney, agent, or representative if you are represented. For the avoidance of doubt, the ability to opt out of arbitration described in this Section 2(a)(3)(b) only applies if the arbitrator or panel of arbitrators determines that you have violated the Mass Action Waiver. If the parties proceed with arbitration, the parties agree that arbitrations will be batched as provided in Section 2(a)(3)(c) below.</p>
-            <h4 className="text-base font-semibold text-gray-800 mt-4 mb-2">c. Batching:</h4>
-            <p className="text-gray-700">i. To increase efficiency of resolution in the event a Mass Action is filed and neither party exercises its right to opt out of arbitration pursuant to Section 2(a)(3)(b) above, the following procedure shall apply. At the request of either party, an arbitrator shall be selected according to the applicable arbitration provider’s rules to act as a special master (“Special Master”) to resolve threshold disputes regarding the propriety of some or all the arbitration demands submitted in the Mass Action (“Mass Arbitration Demands”). These threshold disputes may include, but are not limited to:</p>
-            <p className="text-gray-700">Any dispute regarding filing fees owed with respect to the Mass Arbitration Demands, including whether claimants have submitted valid fee waivers;</p>
-            <p className="text-gray-700">Any dispute regarding whether the applicable arbitration provider has complied with the Arbitration Agreement with respect to processing and administering the Mass Arbitration Demands;</p>
-            <p className="text-gray-700">Any dispute regarding whether the Mass Arbitration Demands meet the requirements set forth in Section 2(d) below;</p>
-            <p className="text-gray-700">Whether claimants are barred from proceeding with their claims based on a prior settlement agreement, violation of these Terms, or expiration of the statute of limitations;</p>
-            <p className="text-gray-700">Any dispute relating to representation of the same claimant by multiple law firms;</p>
-            <p className="text-gray-700">Any dispute regarding whether the Mass Arbitration Demands were filed with the correct arbitration provider;</p>
-            <p className="text-gray-700">Any dispute regarding discovery common to all claims; and</p>
-            <p className="text-gray-700">Any disputes regarding legal or factual issues common to all claims.</p>
-            <p className="text-gray-700">Any such request shall be made within 15 days following the expiration of the opt-out period described in Section 2(a)(3)(b), and may be made by providing written notice to the arbitration provider. Upon the request of either party to appoint a Special Master to resolve the foregoing issues, the applicable arbitration provider shall refrain from further processing any of the Mass Arbitration Demands to which a dispute has been raised. No further payment for filing fees, administrative costs, or arbitrator fees shall be deemed due with respect to any of the Mass Arbitration Demands as to which a dispute has been raised until after the dispute(s) has/have been resolved by the Special Master. SafeRides™ shall be responsible for the applicable arbitration provider’s and Special Master’s fees and costs related to the proceedings before the Special Master.</p>
-            <p className="text-gray-700">A Special Master appointed pursuant to this procedure shall have no authority to consolidate cases.</p>
-            <p className="text-gray-700">ii. After proceedings before the Special Master have concluded, to the extent any of the Mass Arbitration Demands are permitted to proceed, the parties shall group the Mass Arbitration Demands into batches of no more than 100 demands per batch by state of residence, and then alphabetically by last name (plus, to the extent there are less than 100 arbitration demands left over after the batching described above, a final batch consisting of the remaining demands), and shall inform the arbitration provider of the batches and their compositions within 14 days of the conclusion of proceedings before the Special Master. The arbitration provider shall treat each batch of claims as one case, with each case having one demand for arbitration, one appointed arbitrator, and one set of administrative documents and administrative and filing fees per batch. The parties shall randomly assign sequential numbers to each batch, and only one batch shall proceed to arbitration at a time in the order of the random sequential numbers. A separate arbitrator will be appointed to, and administrative and filing fees assessed for, each batch as the batch proceeds to arbitration. You agree to cooperate in good faith with SafeRides™ and the arbitration provider to implement such a batch approach to resolution and fees. Nothing in this provision shall be construed as limiting the right to object that the filing or presentation of multiple arbitration demands by or with the assistance of the same law firm or organization violates any term of this Agreement.</p>
-            <p className="text-gray-700">iii. If any Mass Arbitration Demands were originally processed as individual arbitration demands before this batching procedure was commenced, further proceedings, including the assessment of further arbitration filing or administration fees to either party shall be governed by the procedures set forth in this Section 2(a)(3).</p>
-            <h3 className="text-lg font-semibold text-gray-900 mt-6 mb-2">Geofenced Service Areas.</h3>
-            <p className="text-gray-700">The Services are only available within designated geographic boundaries (“Geofenced Areas”) as determined by SafeRides™ in its sole discretion. SafeRides™ may modify, expand, or restrict Geofenced Areas at any time. Requests initiated outside a Geofenced Area may be unavailable or automatically canceled.</p>
-            <h3 className="text-lg font-semibold text-gray-900 mt-6 mb-2">Driver agreement</h3>
-            <p className="text-gray-700">Third-Party Providers who provide transportation services are required to enter into a separate written Driver Agreement with SafeRides™, which governs driver eligibility, conduct, insurance obligations, and use of the platform.</p>
-            <h3 className="text-lg font-semibold text-gray-900 mt-6 mb-2">(4) Delegation Clause:</h3>
-            <p className="text-gray-700">Only an arbitrator, and not any federal, state, or local court or agency, shall have exclusive authority to resolve any dispute arising out of or relating to the interpretation, applicability, enforceability, or formation of this Arbitration Agreement, including without limitation any claim that all or any part of this Arbitration Agreement is void or voidable. An arbitrator shall also have exclusive authority to resolve all threshold arbitrability issues, including issues relating to whether these Terms are applicable, unconscionable, or illusory and any defense to arbitration, including without limitation waiver, delay, laches, or estoppel. However, only a court of competent jurisdiction, and not an arbitrator, shall have the exclusive authority to resolve any and all disputes arising out of or relating to the Class Action Waiver and Mass Action Waiver, including, but not limited to, any claim that all or part of the Class Action Waiver and/or Mass Action Waiver is unenforceable, unconscionable, illegal, void, or voidable—except that, as stated and pursuant to the procedures provided in Section 2(a)(3)(b), an arbitrator or panel of arbitrators shall have authority to determine whether the party bringing any claim has violated the Mass Action Waiver.</p>
-            <h3 className="text-lg font-semibold text-gray-900 mt-6 mb-2">(5) Application to Third Parties:</h3>
-            <h3 className="text-lg font-semibold text-gray-900 mt-6 mb-2">(a) Binding effect on 3rd parties</h3>
-            <p className="text-gray-700">This Arbitration Agreement shall be binding upon, and shall include any claims brought by or against any third parties, including but not limited to your spouse, domestic partner, heirs, estate, third-party beneficiaries and assigns, where their underlying claims arise out of or relate to your use of the Services. To the extent that any third-party beneficiary to this agreement brings claims against the Parties, those claims shall also be subject to this Arbitration Agreement.</p>
-            <h3 className="text-lg font-semibold text-gray-900 mt-6 mb-2">(b) Exceptions to Arbitration.</h3>
-            <p className="text-gray-700">Notwithstanding the foregoing, this Arbitration Agreement shall not require arbitration of the following claims: (i) individual claims brought in small claims court so long as the matter remains in such court and advances only on an individual basis; (ii) individual claims of sexual assault or sexual harassment occurring in connection with your use of the Services; and/or (iii) injunctive or other equitable relief in a court of competent jurisdiction to prevent the actual or threatened infringement, misappropriation, or violation of a party’s copyrights, trademarks, trade secrets, patents, or other intellectual property rights.</p>
-            <p className="text-gray-700">Such claims may be brought and litigated in a court of competent jurisdiction by you on an individual basis only. On an individual basis means that you cannot bring such claims as a class, collective, coordinated, consolidated, mass, and/or representative action against SafeRides™. For the avoidance of doubt, this precludes you from bringing claims as or participating in any kind of any class, collective, coordinated, consolidated, mass, and/or representative or other kind of group, multi-plaintiff, or joint action against SafeRides™ and no action brought by you may be consolidated or joined in any fashion with any other proceeding. Where your claims are brought and litigated to completion on such an individual basis in a court of competent jurisdiction, SafeRides™ agrees to honor your election.</p>
-            <p className="text-gray-700">The parties’ agreement not to require arbitration in these limited instances does not waive the enforceability of this Arbitration Agreement as to any other provision (including, but not limited to, the waivers provided for in Section 2(a), which will continue to apply in court as well as in arbitration), or the enforceability of this Arbitration Agreement as to any other controversy, claim, or dispute.</p>
-            <h4 className="text-base font-semibold text-gray-800 mt-4 mb-2">(c) Rules and Governing Law.</h4>
-            <p className="text-gray-700">For disputes arising in South Carolina, the arbitration will be administered by ADR Services, Inc. (“ADR”) in accordance with ADR’s Arbitration Rules (the “ADR Rules”) in effect at the time that the claim is brought, unless the parties agree otherwise in writing. The ADR Rules are available at www.adrservices.com or by searching for “ADR Arbitration Rules” using a search engine such as www.google.com. The arbitration shall be heard by one arbitrator (the “Arbitrator”) selected in accordance with the ADR Rules.</p>
-            <p className="text-gray-700">For disputes arising outside of South Carolina (or for disputes arising in South Carolina only if ADR cannot or will not administer the arbitration), the parties shall be required to meet and confer to select a neutral arbitration provider. Such an arbitration provider shall have operations in the state in which the dispute arises. If the parties are unable to mutually agree upon an arbitration provider, then either party may invoke 9 U.S.C. § 5 to request that a court of competent jurisdiction appoint an arbitration provider with operations in the state in which the dispute arises. Any arbitration provider appointed by a court under 9 U.S.C. § 5 shall conduct arbitration solely on an individualized basis as set forth in this Section 2. Once the parties mutually agree upon a neutral arbitration provider, or an arbitrator provider is appointed under 9 U.S.C. § 5, the ensuing arbitration shall commence pursuant to the rules of the designated arbitration provider, except as designated herein. Once an arbitration provider is agreed upon or appointed, an Arbitrator shall be appointed. The Arbitrator will be either (1) a retired judge or (2) an attorney licensed to practice law in the state where the arbitration is conducted with experience in the law underlying the dispute. The Arbitrator will be selected by the parties from the applicable arbitration provider’s roster of arbitrators. If the parties are unable to agree upon an Arbitrator after a good faith meet and confer effort, then the applicable arbitration provider will appoint the Arbitrator in accordance with its rules.</p>
-            <p className="text-gray-700">Notwithstanding any choice of law or other provision in these Terms, the parties agree and acknowledge that this Arbitration Agreement evidences a transaction involving interstate commerce and that the Federal Arbitration Act, 9 U.S.C. § 1, et seq. (“FAA”), will govern its interpretation and enforcement and proceedings pursuant thereto. It is the intent of the parties to be bound by the provisions of the FAA for all purposes, including, but not limited to, interpretation, implementation, enforcement, and administration of this Arbitration Agreement, and that the FAA and the applicable arbitration provider’s rules shall preempt all state laws to the fullest extent permitted by law. All statutes of limitations that would otherwise be applicable will apply to any arbitration proceeding. If the FAA and applicable arbitration provider’s rules are found to not apply to any issue regarding the interpretation or enforcement of this Arbitration Agreement, then that issue shall be resolved under the laws of the state where you reside when you accept these Terms.</p>
-            <p className="text-gray-700">Any dispute, claim, or controversy arising out of or relating to incidents or accidents resulting in personal injury (including but not limited to sexual assault or harassment claims) or death that you allege occurred in connection with your use of the Services, whether before or after the date you agreed to the Terms, shall be governed by and construed in accordance with the laws of the state in which the incident or accident occurred.</p>
-            <h4 className="text-base font-semibold text-gray-800 mt-4 mb-2">(d) Process.</h4>
-            <h4 className="text-base font-semibold text-gray-800 mt-4 mb-2">Pre-Arbitration Dispute Resolution and Notification.</h4>
-            <p className="text-gray-700">The parties agree that good-faith informal efforts to resolve disputes often can result in a prompt, low-cost, and mutually beneficial outcome. The parties therefore agree that, before either party demands arbitration against the other, we will personally meet and confer, via telephone or videoconference, in a good-faith effort to resolve informally any claim covered by this Arbitration Agreement. Multiple individuals initiating claims cannot participate in the same informal telephonic dispute resolution conference. If you are represented by counsel, your counsel may participate in the conference, but you shall also fully participate in the conference. The party initiating the claim must give notice to the other party in writing of their intent to initiate an informal dispute resolution conference, which shall occur within 60 days after the other party receives such notice, unless an extension is mutually agreed upon by the parties. To notify SafeRides™ that you intend to initiate an informal dispute resolution conference, email to SafeRides™, saferideshelp@gmail.com providing your name, the telephone number(s) associated with your SafeRides™ account (if any), the email address(es) associated with your SafeRides™ account, and a description of your claim. Engaging in an informal dispute resolution conference is a condition precedent that must be fulfilled before commencing arbitration, and the Arbitrator shall dismiss any arbitration demand filed before completion of an informal dispute resolution conference. The statute of limitations and any filing fee deadlines shall be tolled while the parties engage in the informal dispute resolution process required by this paragraph.</p>
-            <h4 className="text-base font-semibold text-gray-800 mt-4 mb-2">Initiating Arbitration.</h4>
-            <p className="text-gray-700">In order to initiate arbitration following the conclusion of the informal dispute resolution process required by this Section, a party must:</p>
-            <p className="text-gray-700">Provide written notice of the demand for arbitration to the other party.</p>
-            <p className="text-gray-700">File the demand with the applicable arbitration provider, as determined by Section 2(c).</p>
-            <p className="text-gray-700">A party initiating an arbitration against SafeRides™ must send the written demand for arbitration to: SafeRides™, Attn: Legal Department, 600 Heyward St Apt 451, Columbia, SC 29201</p>
-            <p className="text-gray-700">Alternatively, if applicable, service may be made upon SafeRides™’ registered agent for service of process. Note: SafeRides™ does not currently designate a registered agent; this section will be updated upon formal entity registration.</p>
-            <p className="text-gray-700">Additionally, the initiating party must: Email an electronic version of the demand to the applicable arbitration provider, and Send a copy of the as-filed demand to: saferideshelp@gmail.com</p>
-            <p className="text-gray-700">By signing the demand for arbitration, counsel certifies to the best of their knowledge, information, and belief—formed after an inquiry reasonable under the circumstances—that: The demand is not being presented for any improper purpose, such as to harass, cause unnecessary delay, or needlessly increase the cost of dispute resolution;</p>
-            <p className="text-gray-700">The claims and legal contentions are warranted by existing law, or by a nonfrivolous argument for extending, modifying, or reversing existing law, or for establishing new law; and The factual contentions have evidentiary support, or—if so identified—are likely to have evidentiary support after a reasonable opportunity for investigation or discovery.</p>
-            <p className="text-gray-700">The Arbitrator shall be authorized to grant any relief or impose any sanctions available under Federal Rule of Civil Procedure 11, or any applicable South Carolina state law, for either party’s violation of this requirement.</p>
-            <h4 className="text-base font-semibold text-gray-800 mt-4 mb-2">(e) Location.</h4>
-            <p className="text-gray-700">Unless you and SafeRides™ otherwise agree, if you reside in the United States, the arbitration will be conducted in the county where you reside. If you do not reside in the United States, the arbitration will be conducted in the county where the dispute arises. Your right to a hearing will be determined by the applicable arbitration provider’s rules. Subject to the applicable arbitration provider’s rules, the Arbitrator will have the discretion to direct a reasonable exchange of information by the parties, consistent with the expedited nature of the arbitration.</p>
-            <h4 className="text-base font-semibold text-gray-800 mt-4 mb-2">(f) Offers of Judgment.</h4>
-            <p className="text-gray-700">At least 10 days before the date set for the arbitration hearing, any party may serve an offer in writing upon the other party to allow judgment on specified terms. If the offer is accepted, the offer with proof of acceptance shall be submitted to the arbitrator, who shall enter judgment accordingly. If the offer is not accepted prior to the arbitration hearing or within 30 days after it is made, whichever occurs first, it shall be deemed withdrawn, and cannot be given in evidence upon the arbitration. If an offer made by one party is not accepted by the other party, and the other party fails to obtain a more favorable award, the other party shall not recover their post-offer costs and shall pay the offering party’s costs from the time of the offer.</p>
-            <h4 className="text-base font-semibold text-gray-800 mt-4 mb-2">(g) Arbitrator’s Decision.</h4>
-            <p className="text-gray-700">The Arbitrator will render an award within the time frame specified in the applicable arbitration provider’s rules. Judgment on the arbitration award may be entered in any court of competent jurisdiction. The Arbitrator may award declaratory or injunctive relief only in favor of the claimant and only to the extent necessary to provide relief warranted by the claimant’s individual claim. An Arbitrator’s decision shall be final and binding on all parties.</p>
-            <p className="text-gray-700">The Arbitrator is not bound by decisions reached in separate arbitrations, and the Arbitrator’s decision shall be binding only upon the parties to the arbitration that are the subject of the decision.</p>
-            <p className="text-gray-700">The Arbitrator shall award reasonable costs incurred in the arbitration to the prevailing party in accordance with the law(s) of the state in which arbitration is held.</p>
-            <h4 className="text-base font-semibold text-gray-800 mt-4 mb-2">(h) Fees.</h4>
-            <p className="text-gray-700">With the exception of the provisions governing payment of arbitration costs set forth above, your responsibility to pay any filing, administrative, and arbitrator fees will be solely as set forth in the applicable arbitration provider’s rules and shall be up to the amount you would be required to pay if you filed a claim in court.</p>
-            <p className="text-gray-700">If you have a gross monthly income of less than 300% of the federal poverty guidelines, you are entitled to a waiver of arbitration fees and costs, exclusive of arbitrator fees. If you believe that you meet the requirements to obtain a fee waiver, and your demand for arbitration arises outside of South Carolina, then you may request a fee waiver only by submitting to the arbitration provider AO 240, Application to Proceed in District Court Without Prepaying Fees or Costs (found here), or a declaration under oath containing all the information required by AO 240; if your demand for arbitration arises in South Carolina, then you must submit a declaration under oath providing your monthly income and the number of persons in your household.</p>
-            <p className="text-gray-700">Any and all disputes regarding a party’s obligation to pay any arbitration fees or costs that arise after an arbitrator is appointed shall be determined solely by the arbitrator. If such a dispute arises before an arbitrator has been appointed, and if no Special Master has been requested by either party pursuant to Section 2(a)(3)(c)(i) of these Terms, the parties agree that (i) the due date for any disputed fees shall be stayed pending resolution of the parties’ dispute, (ii) a panel of three arbitrators shall be appointed to resolve the parties’ dispute concerning a party’s obligation to pay fees or costs of arbitration, (iii) the panel of arbitrators shall be appointed by each party selecting one arbitrator from the arbitration provider’s roster to serve as neutral arbitrators, and these arbitrators shall appoint a third neutral arbitrator. If the parties’ arbitrators cannot agree on a third arbitrator, the arbitration administrator will select the third arbitrator, (iv) SafeRides™ shall pay any administrative fees or costs incidental to the appointment of a panel of arbitrators under this provision, as well as any fees or costs that would not be incurred in a court proceeding, such as payment of the fees of the arbitrator(s), as well as room rental, and (v) the arbitrator(s) shall issue a written decision with findings of fact and conclusions of law. If two or more fee disputes between a claimant and SafeRides™ arise at or around the same time, the disputes may be consolidated for resolution by a single arbitrator or panel of arbitrators either at the agreement of the parties or the election of the party common to all such disputes.</p>
-            <h4 className="text-base font-semibold text-gray-800 mt-4 mb-2">(I)Severability and Survival.</h4>
-            <p className="text-gray-700">If any portion of this Arbitration Agreement is found to be unenforceable or unlawful for any reason, (i) the unenforceable or unlawful provision shall be severed from these Terms; (ii) severance of the unenforceable or unlawful provision shall have no impact whatsoever on the remainder of the Arbitration Agreement or the parties’ ability to compel arbitration of any remaining claims on an individual basis pursuant to the Arbitration Agreement; and (iii) to the extent that any claims must therefore proceed on a class, collective, consolidated, or representative basis, such claims must be litigated in a civil court of competent jurisdiction and not in arbitration, and the parties agree that litigation of those claims shall be stayed pending the outcome of any individual claims in arbitration.</p>
-            <h2 className="text-xl font-semibold text-gray-900 mt-8 mb-3">3. The Services</h2>
-            <p className="text-gray-700">The Services enable you and other consumers to find, request, or receive (i) Third-Party Services from third party service providers, including without limitation, merchants, retailers, grocers, restaurants, independent drivers, delivery persons, and autonomous vehicles or autonomous vehicle fleet providers (“Third-Party Providers”); (ii) related personalized content, including features, recommendations and advertisements for products or services tailored to your needs and interests; and (iii) certain supporting services, including providing you the ability to express certain preferences about the Third-Party Services or Third-Party Providers, payment processing and customer support. Unless otherwise agreed by SafeRides™ in a separate written agreement with you, these Services are made available solely for your personal, noncommercial use.</p>
-            <p className="text-gray-700">Once you make a request, SafeRides™ notifies Third-Party Providers that an opportunity is available so that the Third-Party Provider may complete your request. It is up to the Third-Party Provider to decide whether or not to offer Third-Party Services to you or at all, and it is up to you to decide whether or not to accept such services from a Third-Party Provider. Please note that once your request for the Services has begun, you may no longer have the option to reschedule or cancel. If SafeRides™ is able to reschedule or cancel your request, you may be charged a fee and/or may not be refunded for items that have been purchased on your behalf.</p>
-            <p className="text-gray-700" style={{ fontSize: "0.85em", lineHeight: 1.6 }}>SAFERIDES™ IS NOT A COMMON OR MOTOR CARRIER AND DOES NOT TRANSPORT PASSENGERS OR GOODS. GENERALLY, THE SERVICES ARE ONLY OPEN TO REGISTERED USERS OF THE SERVICES AND NOT TO THE GENERAL PUBLIC. YOUR ABILITY TO REQUEST, AND IF APPLICABLE, OBTAIN THIRD-PARTY SERVICES FROM THIRD-PARTY PROVIDERS IN CONNECTION WITH THE USE OF THE SERVICES DOES NOT ESTABLISH SAFERIDES™ AS A PROVIDER OF ANYTHING OTHER THAN THE SERVICES. THIRD-PARTY PROVIDERS ARE INDEPENDENT AND NOT ACTUAL AGENTS, APPARENT AGENTS, OSTENSIBLE AGENTS, OR EMPLOYEES OF SAFERIDES™ IN ANY WAY. ANY EFFORT, FEATURE, PROCESS, POLICY, STANDARD, OR OTHER EFFORT UNDERTAKEN BY SAFERIDES™ TO FACILITATE YOUR RECEIPT OF THIRD PARTY SERVICES OR IN THE INTEREST OF SAFETY OR SECURITY (WHETHER REQUIRED BY APPLICABLE REGULATIONS OR NOT) IS NOT AN INDICIA OF AN EMPLOYMENT, ACTUAL AGENCY, APPARENT AGENCY, OR OSTENSIBLE AGENCY RELATIONSHIP WITH A THIRD-PARTY PROVIDER.</p>
-            <h3 className="text-lg font-semibold text-gray-900 mt-6 mb-2">App Stores.</h3>
-            <p className="text-gray-700">The availability of the Services may be dependent on the third-party from which you received the license to the SafeRides™ App, e.g., the Apple iPhone or Android app stores (“App Store”). These Terms are between you and SafeRides™ and not with the App Store and SafeRides™ is responsible for the provision of Services as described in these Terms. However, if you downloaded the SafeRides™ App from the Apple App Store, Apple and its subsidiaries are third-party beneficiaries of these Terms. Upon your acceptance of these Terms, Apple shall have the right (and will be deemed to have accepted the right) to enforce these Terms against you as a third-party beneficiary thereof. These Terms incorporate by reference Apple’s Licensed Application End User License Agreement, for purposes of which, you are the “end-user.” In the event of a conflict in the terms of the Licensed Application End User License Agreement and these Terms, these Terms will control.</p>
-            <h3 className="text-lg font-semibold text-gray-900 mt-6 mb-2">Ownership; License; and Restrictions.</h3>
-            <p className="text-gray-700">The Services and all rights, title, and interest, including all related intellectual property rights therein, are and shall remain SafeRides™’s property or the property of SafeRides™’s licensors. These Terms are not a sale and do not convey or grant to you any rights in or related to the Services, or any intellectual property rights owned by SafeRides™ or its licensors, except for the limited license granted herein.</p>
-            <p className="text-gray-700">Subject to your compliance with these Terms, SafeRides™ grants you a limited, non-exclusive, non-sublicensable, revocable, non-transferable license to: (i) access and use the SafeRides™ App solely in connection with your use of the Services on your personal device; and (ii) access and use any content, information and related materials that may be made available through the Services, in each case solely for your personal, noncommercial use. Any rights not expressly granted herein are reserved by SafeRides™ and SafeRides™’s licensors. You agree that you will not use SafeRides™’s copyrights, trademarks, service marks, or trade dress, aside from use incidental to your use of the Services, without express, written permission from SafeRides™. This prohibition includes use in domain names, websites, and social media accounts. You may not: (i) remove any copyright, trademark or other proprietary notices from any portion of the Services; (ii) reproduce, modify, prepare derivative works based upon, distribute, license, lease, sell, resell, transfer, publicly display, publicly perform, transmit, stream, broadcast or otherwise exploit the Services except as expressly permitted by SafeRides™; (iii) decompile, reverse engineer or disassemble the Services except as may be permitted by applicable law; (iv) link to, mirror or frame any portion of the Services; (v) cause or launch any programs or scripts for the purpose of, or which result in, unduly burdening or hindering the operation and/or functionality of any aspect of the Services; or (vi) attempt to gain unauthorized access to or impair any aspect of the Services or its related systems or networks.</p>
-            <h2 className="text-xl font-semibold text-gray-900 mt-8 mb-3">4. Third-Party Services (including Autonomous Vehicles) and Content</h2>
-            <p className="text-gray-700">While many Third-Party Services are available in the SafeRides™ App, certain Third-Party Services or content are only accessible by exiting the SafeRides™ App (“Out-of-App Experiences”). Once you click on a link to access Out-of-App Experiences, you will be subject to the terms and conditions and privacy policy of that website, destination, or Out-of-App Experience provider, which are different from SafeRides™’s. SafeRides™ will not warn you that you have left the Services or that you are subject to the terms and conditions (including privacy policies) of another website, destination, or Out-of-App Experience provider. You use all links in third-party websites and advertisements at your own risk as these are not part of the Services and are not controlled by SafeRides™. SafeRides™ does not endorse such Out-of-App Experience providers and in no event shall SafeRides™ be responsible or liable for any products or services of such providers.Third-Party Services made available to you through the SafeRides™ App may be provided by an autonomous vehicle. An autonomous vehicle is a vehicle that is capable of operating at, or is equipped with an automated driving system that will enable the vehicle to operate at SAE Levels 3, 4 or 5 of driving automation as defined in the J3016 April 2021 SAE International specification (“Autonomous Vehicle” or “AV”). Autonomous Vehicles are operated by Third-Party Providers that operate a fleet of one or more AVs and may employ or contract with individuals to manage, monitor, or operate its AVs while such vehicles are in motion (such Third-Party Providers, &quot;Autonomous Vehicle Fleet Providers&quot;). Your access to Third-Party Services provided by AV may be subject to Autonomous Vehicle Fleet Providers' terms including Waymo’s Terms of Service, which are incorporated herein by reference.Third-Party Services may be subject to additional terms, conditions, fees, and policies imposed by the Third-Party Provider. In the event of a conflict in the terms of any Third-Party Services and these Terms, these Terms shall control with respect to SafeRides™ and your agreements with SafeRides™ herein, and the limitations of liability set forth in Section 8 shall also apply to claims involving a Third-Party Provider. The Arbitration Agreement provisions in Section 2 above shall apply instead of the terms of any Third-Party Services for all purposes except with respect to claims that are solely against the Third-Party Provider.</p>
-            <h2 className="text-xl font-semibold text-gray-900 mt-8 mb-3">5. Accessing the Services</h2>
-            <h3 className="text-lg font-semibold text-gray-900 mt-6 mb-2">User Accounts.</h3>
-            <p className="text-gray-700">In order to use most aspects of the Services, you must register for and maintain an active personal user Services account (“Account”). Unless a specific Service provides otherwise: (i) you must be at least 17 years of age, or the age of legal majority in your jurisdiction (if different than 17), to obtain an Account, (ii) you may only possess one Account and (iii) you may not assign or otherwise transfer your Account to any other person or entity. SafeRides™ maintains the right to delete or deactivate duplicate accounts. You are responsible for all activity that occurs under your Account, and you agree to maintain the security and secrecy of your Account credentials at all times.You cannot register for or maintain an Account if you have previously been banned from accessing or using the Services. Account registration may require you to submit to SafeRides™ certain personal information, such as your name, address, still or live photo, mobile phone number and age, as well as at least one valid payment method that you are authorized to use and is supported by SafeRides™ (“Account Information”). You are responsible for providing accurate Account Information and in certain instances, you may be asked to provide proof of age, identity or other method of identity verification to access or use the Services. You may be denied access to, or use of, the Services if you refuse to provide (or we are unable to verify) proof of age, identity, or other method of identity verification. Additionally, you authorize your wireless carrier to use or disclose information about your account and your wireless device, if available, to SafeRides™ or its service providers for the duration of your business relationship, solely to help SafeRides™ identify you or your wireless device and to prevent fraud.SafeRides™ also disable or delete your account if after registration your account is not confirmed (where applicable), your account is unused and remains inactive for an extended period of time, if we detect someone may have used it without your permission and we are unable to confirm your ownership of the account, or where we are required to do so under applicable law. To the maximum extent permitted by applicable law, SafeRides™ and its affiliates assume no liability for such loss of access and use and will have no obligations related to such loss. If you discontinue your use of SafeRides™, or we disable your access to or use of the Services, these Supplemental Terms shall terminate as an agreement between you and us with respect to those Services, but certain sections will survive termination as provided herein.For more information regarding SafeRides™’s use of your personal information, please see our Privacy Notice.</p>
-            <h3 className="text-lg font-semibold text-gray-900 mt-6 mb-2">Minors.</h3>
-            <p className="text-gray-700">You may not authorize third-parties to use your Account, and you may not allow persons under the age of 17 to use the Services unless they are accompanied by you or an adult. However, we may offer parents and guardians the ability to create Accounts for their children. If you are a parent or legal guardian, and you allow your child to use the Services, then these Terms apply to you and you are responsible for your child’s activity on the Services. If you are under the age to obtain an Account, you must have your parent or legal guardian’s permission to use an Account and accept any additional terms required in connection with your access and use of the Services as a minor. Please have your parent or legal guardian read these additional terms with you. Please note: if there is an incident involving minors, in addition to any mandatory reporting obligations, SafeRides™ may also proactively report incidents to the applicable authorities.</p>
-            <h3 className="text-lg font-semibold text-gray-900 mt-6 mb-2">Network Access and Devices.</h3>
-            <p className="text-gray-700">You are responsible for obtaining the data network access necessary to use the Services. Your mobile network's data and messaging rates and fees may apply if you access or use the Services from your device. You are responsible for acquiring and updating compatible hardware or devices necessary to access and use the Services and any updates thereto. SafeRides™ does not guarantee that the Services, or any portion thereof, will function on any particular hardware or devices. In addition, the Services may be subject to malfunctions and delays inherent in the use of the Internet and electronic communications. SafeRides™ is not responsible for any resulting delays, delivery failures, or damage, loss, injury or death.</p>
-            <h2 className="text-xl font-semibold text-gray-900 mt-8 mb-3">6. User Conduct and Requirements; Communications; and User Content</h2>
-            <p className="text-gray-700">In addition to complying with these Terms, you agree to comply with all applicable laws when accessing or using the Services, and you may only access or use the Services for lawful purposes. You may not access or use the Services to cause nuisance, annoyance, inconvenience, damage, or loss to SafeRides™, the Third-Party Provider, or any other party.</p>
-            <p className="text-gray-700">If you request a ride option with a child restraint system, neither SafeRides™ nor the Third-Party Provider is responsible for the safety of a child restraint system that may be available in the Third-Party Provider’s vehicle. It is your obligation to ensure that the child restraint system is installed correctly and that the child is properly secured in the child restraint system. Please refer to your state’s laws regarding specific height, age, and weight requirements for using child restraint systems, as well as SafeRides™’s policies for child restraint systems, which may be set forth on city-specific web pages. If you request a ride option where a Third-Party Provider agrees to provide you with assistance outside of the vehicle (e.g., SafeRides™ Assist), SafeRides™ is not responsible for any injury, death or incident that may arise out of the assistance provided by the Third-Party Provider.</p>
-            <p className="text-gray-700">Subject to the discretion of a Third-Party Provider, you may be allowed to bring a small animal, such as a dog or cat, on a ride requested through the Services. For such trips, you are responsible for properly securing the animal with a leash, harness, crate / carrier, or through other means. You are also responsible for ensuring that the animal does not cause damage or a mess in the Third-Party Provider’s vehicle. You may be subject to a Charge for Repair or Cleaning under Section 6 below for any damage or mess caused by an animal that is transported during a ride requested under your Account. Please note, in accordance with SafeRides™’s policies on Service Animals and Assistive Devices, Service Animals are generally permitted to accompany riders without extra charge, regardless of whether it is a Pet Friendly Trip.</p>
-            <p className="text-gray-700">For the purpose of assisting us with our compliance and insurance obligations, you agree to notify us within 24 hours and provide us with all reasonable information relating to any incident or accident that occurs during your use of the Services and you agree to cooperate with any investigation and attempted resolution of such incident.</p>
-            <h3 className="text-lg font-semibold text-gray-900 mt-6 mb-2">Communications with SafeRides™.</h3>
-            <p className="text-gray-700">By creating an Account, you electronically agree to accept and receive communications from SafeRides™, Third-Party Providers or third parties providing services to SafeRides™ including via email, text message, WhatsApp, calls, in-app communications, and push notifications to the telephone number(s) or email addresses you provided to SafeRides™. You may also receive communications generated by automatic telephone dialing systems and/or which will deliver prerecorded or automated messages sent by or on behalf of SafeRides™, and/or Third-Party Providers, including but not limited to communications concerning requests placed through your Account on the Services. Message and data rates may apply. You can learn more about how SafeRides™ may contact you by reading our Privacy Notice.You may change your notification preferences by accessing Settings in your Account. To opt out of receiving text messages from SafeRides™, you must reply “STOP” from the mobile device receiving the messages. Text messages between you and Third-Party Providers are transactional text messages, not promotional text messages. You acknowledge that opting out of receiving all communications may impact your use of the Services. Notwithstanding the foregoing, if we suspect fraud or unlawful activity on your Account, SafeRides™ may contact you using any of the contact information you provided in connection with your Account (including via text or voice-recorded message).</p>
-            <h3 className="text-lg font-semibold text-gray-900 mt-6 mb-2">Use of Accounts Owned by Others.</h3>
-            <p className="text-gray-700">In the event you use a SafeRides™ product or service that enables use of or billing to another person or business, certain information will be shared with that party. This may include information regarding the time and date of services you request, the transportation, logistics and/or delivery requested, and the associated charges for such services. If used to request transportation, we may also share information with such person or business regarding safety-related incidents that occur in connection with such transportation. You acknowledge that such data sharing is a condition of use of any such SafeRides™ product or service.</p>
-            <h3 className="text-lg font-semibold text-gray-900 mt-6 mb-2">User Provided Content; Feedback.</h3>
-            <p className="text-gray-700">Content that you provide to SafeRides™ is governed by SafeRides™’s Generated Content Terms, which are incorporated in these Terms by reference. Feedback that you provide to SafeRides™ is governed by SafeRides™’s Feedback Policy, which are incorporated in these Terms by reference.</p>
-            <h3 className="text-lg font-semibold text-gray-900 mt-6 mb-2">Driver Eligibility Requirements.</h3>
-            <p className="text-gray-700">To provide transportation services through the Services, Third-Party Providers must be at least twenty-one (21) years of age, possess a valid driver’s license, meet SafeRides™’ driver screening and insurance requirements, and enter into a separate Driver Agreement with SafeRides™. SafeRides™ reserves the right to suspend or deactivate any driver account that fails to meet these requirements at any time.</p>
-            <h2 className="text-xl font-semibold text-gray-900 mt-8 mb-3">7. Payment</h2>
-            <h3 className="text-lg font-semibold text-gray-900 mt-6 mb-2">Prices &amp; Charges.</h3>
-            <p className="text-gray-700">Your use of the Services may result in charges to you for the services or goods you receive from SafeRides™ and/or from Third-Party Providers (“Charges”). Prices displayed to you when purchasing goods through the Services may be inclusive of retail prices charged by the Third-Party Provider and fees paid to SafeRides™. SafeRides™ will enable your payment of the applicable Charges for services or goods obtained through your use of the Services. Charges will include applicable taxes where required by law. Charges may include other applicable fees such as delivery fees, service fees, product return fees, cancellation fees, government-mandated fees (such as bag fees), estimated or actual tolls, and/or surcharges. Further, Charges applicable in certain geographical areas may increase substantially during times of high demand or due to other marketplace factors. With respect to Third-Party Providers, Charges you incur will be owed directly to Third-Party Providers, and SafeRides™ will collect payment of those charges from you, on the Third-Party Provider’s behalf as their limited payment collection agent, and payment of the Charges shall be considered the same as payment made directly by you to the Third-Party Provider. Payment to a Third-Party Provider of goods or services shall be considered to occur at the moment you submit payment through SafeRides™. You retain the right to request lower Charges from a Third-Party Provider for services or goods received by you from such Third-Party Provider at the time you receive such services or goods. A Third-Party Provider also retains the right to request higher Charges from you for services or goods provided. For example, a Third-Party Provider that is a merchant may collect lower or higher charges where the actual goods provided differ from the products originally requested, including in connection with differences in quantity, weight, or item type. Subject to requests from you to lower such Charges from a Third-Party Provider, you agree to pay such higher or lower Charges associated with such product differences. SafeRides™ will consider in good faith any request from a Third-Party Provider to modify the Charges for a particular service or good. This payment structure is intended to fully compensate a Third-Party Provider, if applicable, for the services or goods obtained in connection with your use of the Services. There also may be certain Charges you incur that will be owed and paid directly to SafeRides™ or its affiliates. For the avoidance of doubt, SafeRides™ does not charge a fee for you to access the SafeRides™ App, but may charge you a fee or any other Charge for accessing Third-Party Services. Even if not indicated in the SafeRides™ App, the prices for product or menu items displayed through the Services may differ from the prices offered or published by Third-Party Providers for the same product or menu items, including as may be offered or published at a physical location operated by a Third-Party Provider, and/or from prices available at other third-party websites/mobile applications. Prices for product or menu items displayed through the Services may not be the lowest prices at which the product or menu items are sold. The product or menu item prices displayed through the Services or fees charged by and paid to SafeRides™ may vary based on whether you choose to pick up your order or have it delivered. When you add a payment method to your account, you authorize us and our payment service providers to collect and store your payment method information. Any payment method added by you will be automatically saved to your SafeRides™ wallet. You can add multiple payment methods to your wallet, and you agree that SafeRides™ may charge any of these payment methods for any future transactions or Charges. Your default payment method is identified in your profile page within the SafeRides™ wallet. If your default payment method is expired, invalid or otherwise not able to be charged, you agree that SafeRides™ may charge any other available payment method saved in your wallet. You can change your default payment method at any time. If your payment method’s account information changes (e.g., account number, routing number, expiration date) as a result of re-issuance, expiration or otherwise, we may automatically update your payment method on file, in accordance with applicable law, if we acquire that information from our financial services partners or your bank. We reserve the right to decline, refuse or limit the use of any payment methods that we believe may be unauthorized, fraudulent or illegal or may violate our policies or procedures or otherwise expose SafeRides™ to an unacceptable level of risk.</p>
-            <p className="text-gray-700">When you pay for any Charges using your bank account as your selected payment method, you authorize us to debit your bank account for the total cost of all Charges, including any applicable taxes and fees. You also authorize us to further debit or credit your bank account to correct any erroneous debits, make adjustments to your payment, or issue a refund back to your bank account. Your bank account must be able to accept debits denominated in USD.</p>
-            <p className="text-gray-700">Certain payment methods may involve the use of third-party payment service providers not affiliated with SafeRides. You may be subject to additional fees imposed by these payment service providers in connection with processing your payment. SafeRides is not responsible for any of these fees and disclaims all liability for such fees. You should review the payment service provider’s terms of use before using such payment method.</p>
-            <p className="text-gray-700">As between you and SafeRides, SafeRides reserves the right to establish or adjust Charges for any or all services or goods obtained through the use of the Services at any time. SafeRides will use reasonable efforts to inform you of Charges that may apply, provided that you will be responsible for Charges incurred under your Account regardless of your awareness of such Charges or the amounts thereof.</p>
-            <h3 className="text-lg font-semibold text-gray-900 mt-6 mb-2">Refunds.</h3>
-            <p className="text-gray-700">Charges paid by you are final and non-refundable, unless otherwise determined by SafeRides and the Third-Party Provider assessing the Charge. If you have any requests for cancellations, refunds, or returns, or if you think a correction should be made to any Charge you incurred, please visit the “Problem” tab in your Account to initiate such requests within 30 days after the Charge took place or SafeRides™ will have no further responsibility and you waive your right to later dispute the amounts charged.</p>
-            <h3 className="text-lg font-semibold text-gray-900 mt-6 mb-2">Promotional Offers.</h3>
-            <p className="text-gray-700">Certain users may, from time to time, receive promotional offers and discounts that result in different amounts charged for the same or similar services or goods obtained through the use of the Services, and you agree that such promotional offers and discounts, unless also made available to you, shall have no bearing on your use of the Services or the Charges applied to you. Promotional offers and discounts are subject to change or withdrawal at any time and without notice.</p>
-            <h3 className="text-lg font-semibold text-gray-900 mt-6 mb-2">Gratuity.</h3>
-            <p className="text-gray-700">Except for amounts provided by you through the Services as part of the “tip” feature, SafeRides™ does not designate any portion of your payment as a tip or gratuity to a Third-Party Provider. You understand and agree that, while you are free to provide additional payment as a gratuity to any Third-Party Provider who provides you with services or goods obtained through the Service, you are under no obligation to do so.</p>
-            <h3 className="text-lg font-semibold text-gray-900 mt-6 mb-2">Damage, Cleaning, Lost and Found, and Charges for Violation of Terms.</h3>
-            <p className="text-gray-700">SafeRides™ may charge you a fee on behalf of Third-Party Providers if, during your use of the Services, you have caused damage to a vehicle or property that requires repair or cleaning (“Repair” or “Cleaning”). The amount of such fee shall be determined, in SafeRides™’s sole discretion, based on the type of damage and the severity. SafeRides™ reserves the right to verify or otherwise require documentation of damages prior to processing a fee. In the event that a Repair or Cleaning request is verified by SafeRides™ in SafeRides™‘s reasonable discretion, SafeRides™ reserves the right to facilitate payment for the reasonable cost of such Repair or Cleaning using your payment method designated in your Account. Such amounts, as well as those pertaining to lost and found goods, will be transferred by SafeRides™ to a Third-Party Provider, if applicable, and are non-refundable. Additionally, if you fail to comply with these Terms, you may be responsible for Charges, including without limitation, for transactions that could not be completed properly, arising out of or in connection with your failure to comply with these Terms.</p>
-            <h2 className="text-xl font-semibold text-gray-900 mt-8 mb-3">8. Disclaimers; Limitation of Liability; and Indemnity</h2>
-            <h3 className="text-lg font-semibold text-gray-900 mt-6 mb-2">Disclaimers.</h3>
-            <p className="text-gray-700" style={{ fontSize: "0.85em", lineHeight: 1.6 }}>THE SERVICES ARE PROVIDED “AS IS” AND “AS AVAILABLE.” SAFERIDES™ DISCLAIMS ALL REPRESENTATIONS AND WARRANTIES, EXPRESS, IMPLIED, OR STATUTORY, NOT EXPRESSLY SET OUT IN THESE TERMS, INCLUDING THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN ADDITION, SAFERIDES™ MAKES NO REPRESENTATION, WARRANTY, OR GUARANTEE REGARDING THE RELIABILITY, TIMELINESS, QUALITY, SUITABILITY, OR AVAILABILITY OF THE SERVICES OR ANY SERVICES OR GOODS REQUESTED THROUGH THE USE OF THE SERVICES, OR THAT THE SERVICES WILL BE UNINTERRUPTED OR ERROR-FREE.</p>
-            <p className="text-gray-700" style={{ fontSize: "0.85em", lineHeight: 1.6 }}>SAFERIDES™ DOES NOT GUARANTEE THE QUALITY, SUITABILITY, SAFETY OR ABILITY OF THIRD-PARTY PROVIDERS. YOU AGREE THAT THE ENTIRE RISK ARISING OUT OF YOUR USE OF THE SERVICES, AND ANY SERVICE OR GOOD REQUESTED OR OBTAINED FROM THIRD-PARTY PROVIDERS IN CONNECTION THEREWITH, REMAINS SOLELY WITH YOU, TO THE MAXIMUM EXTENT PERMITTED UNDER APPLICABLE LAW.</p>
-            <p className="text-gray-700" style={{ fontSize: "0.85em", lineHeight: 1.6 }}>SAFERIDES™ DOES NOT CONTROL, MANAGE OR DIRECT ANY THIRD-PARTY PROVIDERS. THIRD-PARTY PROVIDERS ARE NOT ACTUAL AGENTS, APPARENT AGENTS, OSTENSIBLE AGENTS, OR EMPLOYEES OF SAFERIDES™. IF A DISPUTE ARISES BETWEEN YOU AND OR ANY OTHER THIRD PARTY, YOU RELEASE SAFERIDES™ FROM LOSSES OF EVERY KIND AND NATURE, KNOWN AND UNKNOWN, SUSPECTED AND UNSUSPECTED, DISCLOSED AND UNDISCLOSED, ARISING OUT OF OR IN ANY WAY CONNECTED WITH SUCH DISPUTES.</p>
-            <p className="text-gray-700" style={{ fontSize: "0.85em", lineHeight: 1.6 }}>SAFERIDES™ DOES NOT CONTROL, ENDORSE OR TAKE RESPONSIBILITY FOR ANY USER CONTENT OR THIRD-PARTY CONTENT AVAILABLE ON OR LINKED TO BY THE SERVICES. SAFERIDES™ CANNOT AND DOES NOT REPRESENT OR WARRANT THAT THE SERVICES ARE FREE OF VIRUSES OR OTHER HARMFUL COMPONENTS.</p>
-            <p className="text-gray-700" style={{ fontSize: "0.85em", lineHeight: 1.6 }}>SAFERIDES™’S USE OF ALGORITHMS IN AN ATTEMPT TO PROVIDE SERVICES OR IMPROVE THE EXPERIENCE OF USERS AND THE SECURITY AND SAFETY OF THE SERVICES DOES NOT CONSTITUTE A GUARANTEE OR WARRANTY OF ANY KIND, EXPRESSED OR IMPLIED.</p>
-            <h3 className="text-lg font-semibold text-gray-900 mt-6 mb-2">Limitation of Liability.</h3>
-            <p className="text-gray-700" style={{ fontSize: "0.85em", lineHeight: 1.6 }}>SAFERIDES™ SHALL NOT BE LIABLE FOR INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, PUNITIVE, OR CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS, LOST DATA, PERSONAL INJURY OR DEATH, OR PROPERTY DAMAGE RELATED TO, IN CONNECTION WITH, OR OTHERWISE RESULTING FROM ANY USE OF THE SERVICES, REGARDLESS OF THE NEGLIGENCE (EITHER ACTIVE, AFFIRMATIVE, SOLE, OR CONCURRENT) OF SAFERIDES™, EVEN IF SAFERIDES™ HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.</p>
-            <p className="text-gray-700" style={{ fontSize: "0.85em", lineHeight: 1.6 }}>SAFERIDES™ SHALL NOT BE LIABLE FOR ANY DAMAGES, LIABILITY OR LOSSES ARISING OUT OF: (i) YOUR USE OF OR RELIANCE ON THE SERVICES OR YOUR INABILITY TO ACCESS OR USE THE SERVICES; OR (ii) ANY TRANSACTION OR RELATIONSHIP BETWEEN YOU AND ANY THIRD-PARTY PROVIDER, EVEN IF SAFERIDES™ HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. SAFERIDES™ SHALL NOT BE LIABLE FOR DELAY OR FAILURE IN PERFORMANCE RESULTING FROM CAUSES BEYOND SAFERIDES™'S REASONABLE CONTROL. YOU ACKNOWLEDGE THAT THIRD-PARTY PROVIDERS PROVIDING TRANSPORTATION SERVICES REQUESTED THROUGH SOME SAFERIDES™ SERVICES MAY OFFER RIDESHARING OR PEER-TO-PEER TRANSPORTATION SERVICES AND MAY NOT BE PROFESSIONALLY LICENSED OR PERMITTED. YOU ACKNOWLEDGE THAT THIRD-PARTY PROVIDERS ARE NOT OSTENSIBLE AGENTS, APPARENT AGENTS, ACTUAL AGENTS, OR EMPLOYEES OF SAFERIDES™.</p>
-            <p className="text-gray-700" style={{ fontSize: "0.85em", lineHeight: 1.6 }}>THE SERVICES MAY BE USED BY YOU TO REQUEST AND SCHEDULE TRANSPORTATION, GOODS, OR LOGISTICS SERVICES WITH THIRD-PARTY PROVIDERS, BUT YOU AGREE THAT SAFERIDES™ HAS NO RESPONSIBILITY OR LIABILITY TO YOU RELATED TO ANY TRANSPORTATION, GOODS OR LOGISTICS SERVICES PROVIDED TO OR NOT PROVIDED TO YOU BY THIRD-PARTY PROVIDERS OTHER THAN AS EXPRESSLY SET FORTH IN THESE TERMS.</p>
-            <p className="text-gray-700" style={{ fontSize: "0.85em", lineHeight: 1.6 }}>SAFERIDES™ SHALL NOT BE LIABLE FOR ANY DAMAGES, LIABILITY OR LOSSES ARISING OUT OF LACK OF OR IMPROPER INSTALLATION OR USE OF CHILD RESTRAINT SYSTEMS FOR GUESTS ON RIDES REQUESTED THROUGH THE SERVICES FOR WHOM A CHILD RESTRAINT SYSTEM IS LEGALLY REQUIRED.</p>
-            <p className="text-gray-700" style={{ fontSize: "0.85em", lineHeight: 1.6 }}>THE LIMITATIONS AND DISCLAIMERS IN THIS SECTION DO NOT PURPORT TO LIMIT LIABILITY OR ALTER YOUR RIGHTS AS A CONSUMER THAT CANNOT BE EXCLUDED UNDER APPLICABLE LAW. BECAUSE SOME STATES OR JURISDICTIONS DO NOT ALLOW THE EXCLUSION OF OR THE LIMITATION OF LIABILITY FOR CONSEQUENTIAL OR INCIDENTAL DAMAGES, IN SUCH STATES OR JURISDICTIONS, SAFERIDES™’S LIABILITY SHALL BE LIMITED TO THE EXTENT PERMITTED BY LAW. THIS PROVISION SHALL HAVE NO EFFECT ON SAFERIDES™’S CHOICE OF LAW PROVISION SET FORTH BELOW.</p>
-            <h3 className="text-lg font-semibold text-gray-900 mt-6 mb-2">Indemnity.</h3>
-            <p className="text-gray-700">You agree to indemnify and hold SafeRides™ and its affiliates and their officers, directors, employees, and agents harmless from and against any and all actions, claims, demands, losses, liabilities, costs, damages, and expenses (including attorneys’ fees), arising out of or in connection with: (i) your use of the Services or services or goods obtained through your use of the Services; (ii) your breach or violation of any of these Terms; (iii) SafeRides™'s use of your User Content; or (iv) your violation of the rights of any third party, including Third-Party Providers.</p>
-            <h2 className="text-xl font-semibold text-gray-900 mt-8 mb-3">9. Other Provisions</h2>
-            <h3 className="text-lg font-semibold text-gray-900 mt-6 mb-2">Choice of Law.</h3>
-            <p className="text-gray-700">These Terms shall be governed by and construed in accordance with the laws of the state in which your dispute arises, without regard to the choice or conflict of law principles of any jurisdiction, except as may be otherwise provided in the Arbitration Agreement in Section 2 above or in Supplemental Terms applicable to your region. This Choice of Law provision applies only to the interpretation of these Terms, and these provisions shall not be interpreted as generally extending any state’s law to you if your dispute did not arise in that state.Any dispute, claim, or controversy arising out of or relating to incidents or accidents resulting in personal injury or death (including but not limited to sexual assault or harassment claims) that you allege occurred in connection with your use of the Services, whether before or after the date you agreed to these Terms, shall be governed by and construed in accordance with the laws of the state in which the incident or accident occurred.</p>
-            <h3 className="text-lg font-semibold text-gray-900 mt-6 mb-2">Choice of Forum.</h3>
-            <p className="text-gray-700">Any dispute, claim, or controversy arising out of or relating to these Terms or the existence, breach, termination, enforcement, interpretation or validity thereof, shall be brought exclusively in the state or federal courts of the state in which the dispute, claim or controversy arose, notwithstanding that other courts may have jurisdiction over the parties and subject matter, except as may be otherwise provided by the Arbitration Agreement above or in Supplemental Terms applicable to your region.Notwithstanding the foregoing, any dispute, claim, or controversy arising out of or relating to incidents or accidents resulting in personal injury (including but not limited to sexual assault or harassment claims) that you allege occurred in connection with your use of the Services, whether before or after the date you agreed to these Terms, shall be brought exclusively in the state or federal courts in the state in which the incident or accident occurred, notwithstanding that other courts may have jurisdiction over the parties and subject matter, and except as may be otherwise provided in the Arbitration Agreement in Section 2 or in Supplemental Terms applicable to your region, to the extent permitted by law.The foregoing Choice of Law and Choice of Forum provisions do not apply to the Arbitration Agreement in Section 2, and we refer you to Section 2 for the applicable provisions for such disputes.</p>
-            <h3 className="text-lg font-semibold text-gray-900 mt-6 mb-2">Claims of Copyright and Trademark Infringement.</h3>
-            <p className="text-gray-700">Claims of copyright and trademark infringement should be sent to SafeRides™’s designated agent. Please see SafeRides™’s Copyright Policy or Trademark Policy for the designated address and additional information.</p>
-            <h3 className="text-lg font-semibold text-gray-900 mt-6 mb-2">Notice.</h3>
-            <p className="text-gray-700">SafeRides™ may give notice by means of a general notice on or through the Services, electronic mail to the email address associated with your Account, telephone or text message to any phone number provided in connection with your Account, or by written communication sent by first class mail or pre-paid post to any address connected with your Account. Such notice shall be deemed to have been given upon the expiration of 48 hours after mailing or posting (if sent by first class mail or pre-paid post) or at the time of sending (if sent by email, telephone, or on or through the Services). Notwithstanding the foregoing, notice of any modifications</p>
-              </>
-            )}
+            {INTRO.map((block, i) => renderBlock(block, i))}
+
+            <section>
+              <h2 className="text-xl font-semibold text-[#1A1A1A] mt-8 mb-3">
+                Table of Contents
+              </h2>
+              <ol className="list-decimal list-inside space-y-1 text-[#1A1A1A]">
+                {TOC.map((item, i) => (
+                  <li key={i}>{item}</li>
+                ))}
+              </ol>
+            </section>
+
+            {SECTIONS.map((section, i) => (
+              <section key={i}>
+                <h2 className="text-xl font-semibold text-[#1A1A1A] mt-8 mb-3">
+                  {section.heading}
+                </h2>
+                {section.blocks.map((block, j) => renderBlock(block, j))}
+              </section>
+            ))}
           </div>
         </div>
       </main>

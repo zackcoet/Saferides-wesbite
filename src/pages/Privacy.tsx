@@ -1,47 +1,378 @@
-import { useEffect, useState } from "react";
-import { signInAnonymously } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
+import { useEffect } from "react";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
-import { auth, db } from "@/lib/firebase";
 
-type LegalContentState = {
-  content: string;
-  loading: boolean;
+// The Privacy Policy renders from this in-file content only. We no longer fetch
+// from the Firestore `legal/terms` document (that field had become truncated on
+// the live site). The Firestore document is intentionally left in place because
+// the mobile apps still read other fields from it.
+
+type Block =
+  | { type: "p"; text: string; strong?: boolean }
+  | { type: "lead"; label: string; text: string }
+  | { type: "h3"; text: string }
+  | { type: "ul"; items: string[] }
+  | { type: "dl"; items: { term: string; def: string }[] };
+
+type Section = { heading: string; blocks: Block[] };
+
+const INTRO: Block[] = [
+  {
+    type: "p",
+    text: "This Privacy Policy explains how Coetzee Tech, Inc., a Delaware corporation doing business as SafeRides (“SafeRides,” “we,” “us,” or “our”), collects, uses, shares, and protects information when you use our services in the United States (the “Services”), including our mobile applications, websites, and related features such as ride requests, student and driver onboarding, scheduling, safety tools, communications, and customer support.",
+  },
+  {
+    type: "p",
+    text: "This Privacy Policy is incorporated into and forms part of the SafeRides Terms of Service. Capitalized terms used but not defined in this Privacy Policy have the meaning given to them in the Terms of Service. By creating an account or using the Services, you acknowledge that you have read and understand this Privacy Policy.",
+  },
+];
+
+const TOC: string[] = [
+  "Who We Are",
+  "Scope of This Policy",
+  "Key Definitions",
+  "Information We Collect",
+  "How We Use Information",
+  "SMS/Text Messaging",
+  "How We Share Information",
+  "Data Retention",
+  "Security",
+  "Your Controls and Choices",
+  "Cookies, Analytics, and Advertising",
+  "Children’s Privacy (18+ Service)",
+  "US State Privacy Rights",
+  "Do Not Sell or Share; Targeted Advertising Opt-Out",
+  "Changes to This Privacy Policy",
+  "How to Contact Us",
+];
+
+const SMS_SECTION: Section = {
+  heading: "6. SMS/Text Messaging",
+  blocks: [
+    {
+      type: "p",
+      text: "If you provide a mobile phone number, SafeRides may send you SMS/text messages for two purposes only: (1) one-time verification codes used to confirm your phone number or complete sign-in/account actions, and (2) ride- and safety-related alerts tied to a Trip you have requested or are taking (such as pickup confirmations, Driver arrival, and Pickup Code/safety notices). We do not send marketing or promotional text messages.",
+    },
+    {
+      type: "lead",
+      label: "No third-party marketing sharing.",
+      text: "We do not sell, rent, or share your mobile phone number with third parties for their own marketing or promotional purposes. Text messaging originator opt-in data and consent are never shared with any third party for marketing purposes.",
+    },
+    {
+      type: "lead",
+      label: "Message frequency.",
+      text: "Message frequency varies based on your account and ride activity — for example, you may receive one message for a verification code, and additional messages only around trips you actually request or take. You will not receive recurring marketing texts.",
+    },
+    {
+      type: "lead",
+      label: "Message and data rates.",
+      text: "Message and data rates may apply, depending on your mobile carrier and plan.",
+    },
+    {
+      type: "lead",
+      label: "Opt-out and help.",
+      text: "You can opt out of ride/safety SMS alerts at any time by replying STOP to any message, or by updating your notification preferences in the App; reply HELP for assistance, or contact saferideshelp@gmail.com. Opting out of SMS does not affect in-app notifications or your ability to use the Services. Note that verification codes are required to complete certain security actions (such as sign-in) and cannot be opted out of while still completing that action.",
+    },
+    {
+      type: "p",
+      text: "SMS vendors we use to deliver these messages act as our service providers and are contractually restricted to using your phone number only to deliver messages on our behalf — not for their own marketing purposes. See Section 7(B) below for more on our service providers generally.",
+    },
+  ],
 };
 
-async function loadLegalField(fieldName: "termsContent" | "privacyContent") {
-  await signInAnonymously(auth);
-  const snap = await getDoc(doc(db, "legal", "terms"));
-  const content = snap.exists() ? snap.data()[fieldName] : "";
-  return typeof content === "string" ? content.trim() : "";
+const SECTIONS: Section[] = [
+  {
+    heading: "1. Who We Are",
+    blocks: [
+      { type: "lead", label: "Company:", text: "Coetzee Tech, Inc. (d/b/a SafeRides™), a Delaware corporation." },
+      { type: "lead", label: "Mailing Address:", text: "214 S Gregg Street, Columbia, SC 29205, United States." },
+      { type: "lead", label: "Privacy Contact:", text: "saferideshelp@gmail.com." },
+      { type: "p", text: "SafeRides operates a campus-focused technology platform that connects verified student Riders with independent Drivers. This Privacy Policy describes our information practices for that platform and the related Services." },
+    ],
+  },
+  {
+    heading: "2. Scope of This Policy",
+    blocks: [
+      { type: "p", text: "This Privacy Policy applies to information we collect from and about:" },
+      {
+        type: "ul",
+        items: [
+          "Riders who request or take rides through the Services;",
+          "Drivers who apply, are onboarded, and provide rides through the Services;",
+          "Visitors to our websites and support channels; and",
+          "Users of related features, such as scheduled rides, referral programs, promotions, and student-organization features.",
+        ],
+      },
+      { type: "lead", label: "United States only.", text: "The Services covered by this Privacy Policy are intended for use in the United States. We do not target or market these Services to users outside the United States under this Privacy Policy." },
+    ],
+  },
+  {
+    heading: "3. Key Definitions",
+    blocks: [
+      {
+        type: "dl",
+        items: [
+          { term: "Personal Information (or Personal Data).", def: "Information that identifies, relates to, describes, or could reasonably be linked, directly or indirectly, with you." },
+          { term: "Sensitive Personal Information (or Sensitive Data).", def: "Certain higher-risk categories of Personal Information that may receive additional protections under applicable law, such as precise geolocation, government identification numbers, account login credentials, and certain safety-related information." },
+          { term: "Processing.", def: "Any operation performed on Personal Information, including collection, use, storage, organization, disclosure, and deletion." },
+        ],
+      },
+    ],
+  },
+  {
+    heading: "4. Information We Collect",
+    blocks: [
+      { type: "p", text: "We collect information in three ways: (A) information you provide to us, (B) information we collect automatically when you use the Services, and (C) information we receive from third parties." },
+      { type: "h3", text: "A. Information You Provide" },
+      { type: "lead", label: "Account and profile information.", text: "When you register and maintain an account, we may collect your name; email address and/or phone number; profile photo (optional for Riders, and generally required for Drivers); password and authentication details; and your university or school email address or other verification signals used to confirm your eligibility for our campus-based community. You may also provide preferred settings, such as accessibility needs and ride or safety preferences." },
+      { type: "lead", label: "Rider information.", text: "We may collect your pickup and drop-off locations (including saved or suggested places you choose); ride requests and ride preferences; scheduled ride details (destination, date, and time); payment method details (we typically receive tokens and limited card details from our payment processors rather than full card numbers); promotional, discount, and referral codes; a verification or Pickup Code you set or use; and your communications with Drivers and with our support team." },
+      { type: "lead", label: "Driver information.", text: "In addition to the above, Drivers may provide a driver’s license and other government-issued identification; vehicle information (such as make, model, year, license plate, insurance details, and inspection information where required); background-check information, subject to vendor processes and applicable law; banking or payout details, typically handled through a payment-processor onboarding flow; tax-related information where required for payouts; and availability and ride-type preferences." },
+      { type: "lead", label: "Safety and support information.", text: "We may collect incident reports (safety issues, complaints, disputes, and lost items); evidence you provide, such as messages, screenshots, and photos; emergency contact information if you choose to add it; and details of your interactions with customer support. If you contact support by phone or in-app and call recording is enabled, we will notify you where required by law." },
+      { type: "h3", text: "B. Information We Collect Automatically" },
+      { type: "lead", label: "Location information.", text: "With your permission, we may collect precise geolocation from your device to enable pickup, routing, estimated arrival times, geofencing, safety features, and fraud prevention. We may collect trip route details during a ride (such as start location, route path, and drop-off), and Driver location while a Driver is online or available and during trips. You can control location permissions in your device settings, but some features will not work without location access." },
+      { type: "lead", label: "Usage and device data.", text: "We may collect your device model and operating-system version; app version; device identifiers (such as an advertising identifier where permitted and a push-notification token); IP address and approximate location derived from it; crash, performance, and diagnostic logs; and app-interaction data such as screens viewed, taps, and session duration." },
+      { type: "lead", label: "Communications and content.", text: "Where in-app messaging exists, we may collect messages sent through the App, the time and date of communications, and delivery or read receipts where enabled." },
+      { type: "lead", label: "Cookies and similar technologies (web).", text: "When you use our websites, we may use cookies, pixels, and similar tools to keep you logged in, remember preferences, measure performance, and support marketing, as described in Section 11." },
+      { type: "h3", text: "C. Information We Receive From Third Parties" },
+      { type: "p", text: "We may receive information about you from:" },
+      {
+        type: "ul",
+        items: [
+          "identity-verification and background-check providers (for Drivers);",
+          "payment processors (for example, to confirm successful payments, chargebacks, and payout-onboarding status);",
+          "mapping and navigation providers (for geocoding, directions, and route estimates);",
+          "analytics and attribution providers (to understand performance and install sources);",
+          "marketing partners, where permitted;",
+          "insurers, claims administrators, investigators, and safety partners, in connection with an incident or claim; and",
+          "law enforcement or government authorities, where legally required or permitted.",
+        ],
+      },
+    ],
+  },
+  {
+    heading: "5. How We Use Information",
+    blocks: [
+      { type: "p", text: "We use information to operate, improve, and protect the Services. Our purposes include the following." },
+      { type: "h3", text: "A. Provide the Services" },
+      {
+        type: "ul",
+        items: [
+          "create and manage accounts, and verify eligibility for our campus community;",
+          "enable ride requests, match Riders with Drivers, and provide routing and estimated arrival times;",
+          "transmit pickup and destination locations and track rides in progress;",
+          "calculate fares, process payments, and facilitate Driver payouts;",
+          "provide receipts and trip history;",
+          "operate scheduled rides, promotions, and referral programs;",
+          "deliver service communications and respond to your requests;",
+          "collect and display feedback and ratings; and",
+          "test, debug, monitor performance and security, and develop new features.",
+        ],
+      },
+      { type: "h3", text: "B. Safety, Trust, and Security" },
+      {
+        type: "ul",
+        items: [
+          "authenticate and verify Users, including Driver onboarding, and prevent fraudulent registrations;",
+          "conduct background checks where permitted or required;",
+          "verify that Drivers’ vehicles meet applicable safety, legal, and platform requirements;",
+          "verify that Users carry the insurance they are required to maintain;",
+          "support safety features, including identity and Pickup Code verification flows and emergency support;",
+          "detect, investigate, and prevent fraud, abuse, and unsafe activity, and enforce our policies; and",
+          "investigate accidents, incidents, disputes, and any related claims, and remove Users who violate our policies.",
+        ],
+      },
+      { type: "h3", text: "C. Improve and Personalize" },
+      { type: "p", text: "We use information to fix bugs and optimize performance, understand feature usage and improve the experience, and personalize content such as suggestions and saved preferences." },
+      { type: "h3", text: "D. Communications" },
+      { type: "p", text: "We use information to send service messages (such as trip updates, confirmations, and security alerts), respond to support tickets, and, where permitted, send marketing messages that you can opt out of." },
+      { type: "h3", text: "E. Legal and Compliance" },
+      { type: "p", text: "We use information to meet legal obligations, resolve disputes, maintain business records, and protect the rights, safety, and property of SafeRides, our Users, and others." },
+    ],
+  },
+  SMS_SECTION,
+  {
+    heading: "7. How We Share Information",
+    blocks: [
+      { type: "p", text: "We do not sell your Personal Information in the way most people understand the word “sell” (that is, handing your data to unrelated third parties for money). However, some US state laws define “sale” and “sharing” broadly, including certain targeted-advertising activities. We address opt-outs in Sections 13 and 14. We may share information as described below." },
+      { type: "h3", text: "A. Between Riders and Drivers (Core Function)" },
+      { type: "p", text: "To complete a Trip, we share information between the Rider and the Driver, which may include:" },
+      {
+        type: "ul",
+        items: [
+          "the Rider’s first name and profile photo (if provided);",
+          "pickup and drop-off locations (which may be approximate until pickup, depending on the feature);",
+          "trip status, estimated arrival time, and route guidance;",
+          "the Driver’s name, profile photo, rating, real-time location, and vehicle make, model, color, and license plate; and",
+          "safety-related information necessary to complete the ride, including the Pickup Code verification flow.",
+        ],
+      },
+      { type: "p", text: "Feedback and ratings submitted after a Trip may be shared with the other party, but the identity of the submitting User will generally be redacted." },
+      { type: "lead", label: "Lost items.", text: "If you believe you left a personal item during a Trip, you can contact us through the App with a description of the item, and we may contact the relevant Driver and attempt to coordinate its return as a courtesy." },
+      { type: "h3", text: "B. Service Providers (Vendors and Processors)" },
+      { type: "p", text: "We use vendors to help run SafeRides, such as cloud hosting and databases; payment processing and payout onboarding; SMS and email delivery; customer-support tools; analytics; mapping and geocoding; and identity-verification and background-check providers (for Drivers). These vendors may process information only on our instructions or as otherwise permitted by law and contract." },
+      { type: "h3", text: "C. Student Organizations and Campus Partners" },
+      { type: "p", text: "If you use features that integrate with a student organization (such as a fraternity, sorority, club, or other campus group), we may share limited information with that organization as necessary to provide the feature you have chosen to use, as described or enabled at the point of use." },
+      { type: "h3", text: "D. Affiliates and Business Transfers" },
+      { type: "p", text: "If SafeRides is involved in a merger, acquisition, financing, reorganization, or sale of assets, information may be transferred as part of that transaction, subject to applicable law." },
+      { type: "h3", text: "E. Legal, Safety, and Enforcement" },
+      { type: "p", text: "We may disclose information to law enforcement, courts, regulators, or government agencies when required or permitted by law (for example, pursuant to court orders, government investigations, or subpoenas); to third parties to protect rights, safety, and security, including for fraud prevention and incident response; and to insurers, claims administrators, or investigators when relevant to an accident, incident, dispute, or claim involving the Services, including a User’s own insurer or a third party’s insurer." },
+      { type: "h3", text: "F. With Your Consent" },
+      { type: "p", text: "If you choose to connect the Services to a third-party service or otherwise ask us to share your information, we will do so with your permission." },
+    ],
+  },
+  {
+    heading: "8. Data Retention",
+    blocks: [
+      { type: "p", text: "We retain information only as long as necessary for the purposes described in this Privacy Policy, including to provide the Services, meet legal and accounting obligations, resolve disputes, and enforce our policies and prevent fraud. Retention periods depend on the type of data:" },
+      {
+        type: "ul",
+        items: [
+          "Account data is generally retained while your account is active;",
+          "Trip and payment records may be retained longer for legal, tax, and accounting purposes;",
+          "Safety and incident records may be retained longer where needed to protect Users and the platform; and",
+          "When you request deletion, we may still retain certain information to comply with law or for legitimate business needs, such as resolving disputes or claims.",
+        ],
+      },
+      { type: "p", text: "In some cases, deleting certain information may require us to deactivate your account, because we cannot provide the Services without it." },
+    ],
+  },
+  {
+    heading: "9. Security",
+    blocks: [
+      { type: "p", text: "We use administrative, technical, and physical safeguards designed to protect information. No system is perfectly secure, and we cannot guarantee absolute security. You are responsible for keeping your login credentials confidential and for using device-level security features. If you believe your account has been compromised, contact us at saferideshelp@gmail.com." },
+    ],
+  },
+  {
+    heading: "10. Your Controls and Choices",
+    blocks: [
+      { type: "lead", label: "Account information.", text: "You can review and update certain profile information in the App." },
+      { type: "lead", label: "Location controls.", text: "You can control location permissions at the device level. If you deny location access, features such as ride matching, routing, and geofencing may not work." },
+      { type: "lead", label: "Marketing preferences.", text: "You can opt out of marketing emails using the unsubscribe link. Under the federal CAN-SPAM Act, businesses must honor opt-out requests within ten (10) business days." },
+      { type: "lead", label: "Push notifications.", text: "You can disable push notifications in your device settings, although some notifications are important for trips and safety." },
+    ],
+  },
+  {
+    heading: "11. Cookies, Analytics, and Advertising",
+    blocks: [
+      { type: "p", text: "On our websites and in our App, we may use cookies, software development kits (SDKs), pixels, and similar technologies to keep you logged in, remember preferences, measure traffic and performance, understand user journeys, and support marketing and attribution." },
+      { type: "lead", label: "Targeted advertising and “sale”/“share” concepts.", text: "Some state laws treat certain advertising-technology disclosures as a “sale” or “sharing” of Personal Information for targeted advertising. If we engage in targeted advertising, you may have the right to opt out, as described in Sections 13 and 14." },
+      { type: "lead", label: "Universal opt-out signals.", text: "Certain states require businesses to recognize browser-based opt-out signals, such as the Global Privacy Control (GPC), for opt-outs of sale or targeted advertising. We aim to honor legally recognized opt-out preference signals where required." },
+    ],
+  },
+  {
+    heading: "12. Children’s Privacy (18+ Service)",
+    blocks: [
+      { type: "p", text: "The Services are intended only for adults who are at least eighteen (18) years old. We do not direct the Services to, and do not knowingly collect Personal Information from, anyone under 18. Consistent with the Children’s Online Privacy Protection Act (“COPPA”), we also do not knowingly collect Personal Information from children under 13." },
+      { type: "p", text: "If you believe a person under 18 has provided us Personal Information, please contact us at saferideshelp@gmail.com and we will take appropriate steps to delete it and terminate the associated account." },
+    ],
+  },
+  {
+    heading: "13. US State Privacy Rights",
+    blocks: [
+      { type: "p", text: "US privacy laws vary by state and continue to evolve. This section summarizes rights that may be available depending on your state of residence." },
+      { type: "lead", label: "How to exercise your rights.", text: "Email saferideshelp@gmail.com with the subject line “Privacy Request” and include your full name; the email or phone number associated with your account; your state of residence; and the type of request (Access, Delete, Correct, Portability, Opt Out, or Appeal). We may need to verify your identity before fulfilling a request, to protect you against fraud. If you use an authorized agent where permitted, we may require proof of authorization and may still verify you directly." },
+      { type: "h3", text: "California (CCPA, as amended by the CPRA)" },
+      { type: "p", text: "California residents may have the right to know and access the categories and specific pieces of Personal Information we collect; to delete Personal Information, subject to exceptions; to correct inaccurate Personal Information; to opt out of the “sale” or “sharing” of Personal Information for cross-context behavioral advertising; to limit the use and disclosure of Sensitive Personal Information where applicable; and to be free from discrimination for exercising these rights. California requires businesses to respond to certain verified requests within 45 days, with a possible extension." },
+      { type: "lead", label: "Notice at collection (high-level summary).", text: "Categories of Personal Information we collect include identifiers; commercial information (such as trip and payment history); geolocation; internet and device information; audiovisual information (if provided); inferences; and, for Drivers, Sensitive Data such as precise geolocation and government identification numbers. We collect this information for the purposes described in Section 5, including providing rideshare services, processing payments and payouts, supporting safety, preventing fraud, providing customer support, improving the Services, and, where permitted, marketing. We disclose information as described in Section 7, including to service providers, between Riders and Drivers to complete Trips, to payment processors and mapping providers, for legal and safety purposes, and in business transfers." },
+      { type: "h3", text: "Other State Privacy Laws" },
+      { type: "p", text: "Depending on your state of residence, you may have rights under a comprehensive state privacy law. The following states have enacted such laws, which generally provide rights to access, delete, correct, and obtain a portable copy of Personal Information, and to opt out of targeted advertising, the sale of Personal Information, and certain profiling (the specific rights and exceptions vary by state):" },
+      {
+        type: "ul",
+        items: [
+          "Virginia (Consumer Data Protection Act);",
+          "Colorado (Colorado Privacy Act);",
+          "Connecticut (Connecticut Data Privacy Act);",
+          "Utah (Utah Consumer Privacy Act — more limited than some states);",
+          "Texas (Texas Data Privacy and Security Act);",
+          "Oregon (Oregon Consumer Privacy Act);",
+          "Montana (Montana Consumer Data Privacy Act);",
+          "Tennessee (Tennessee Information Protection Act);",
+          "Iowa (Iowa Consumer Data Protection Act);",
+          "Delaware (Delaware Personal Data Privacy Act, including recognition of universal opt-out signals);",
+          "New Jersey (New Jersey Data Privacy Act);",
+          "New Hampshire (New Hampshire Data Privacy Act);",
+          "Florida (Florida Digital Bill of Rights);",
+          "Indiana (Indiana Consumer Data Protection Act);",
+          "Kentucky (Kentucky Consumer Data Protection Act); and",
+          "Rhode Island (Rhode Island Data Transparency and Privacy Protection Act).",
+        ],
+      },
+      { type: "h3", text: "Summary of Rights and Appeals" },
+      { type: "p", text: "Depending on your state, you may have the right to: confirm whether we process your Personal Information and access it; request deletion, subject to exceptions; correct inaccuracies; obtain a portable copy; opt out of targeted advertising, the sale of Personal Information, and certain profiling; and appeal a denial where required. If we deny a request, we will explain why, as required, and provide an appeal method where applicable." },
+    ],
+  },
+  {
+    heading: "14. Do Not Sell or Share; Targeted Advertising Opt-Out",
+    blocks: [
+      { type: "p", text: "If applicable state law gives you the right to opt out of targeted advertising, the “sale” of Personal Information, or the “sharing” of Personal Information for cross-context behavioral advertising (California terminology), you may submit an opt-out request by emailing saferideshelp@gmail.com. We also aim to honor legally recognized opt-out preference signals, such as the Global Privacy Control, where required." },
+    ],
+  },
+  {
+    heading: "15. Changes to This Privacy Policy",
+    blocks: [
+      { type: "p", text: "We may update this Privacy Policy from time to time. If we make material changes, we will provide notice through the App, our website, or by other means as required by law. The “Last Updated” date at the top of this Privacy Policy indicates when it was most recently revised." },
+    ],
+  },
+  {
+    heading: "16. How to Contact Us",
+    blocks: [
+      { type: "p", text: "For questions, complaints, or privacy requests, contact us at:" },
+      { type: "lead", label: "Email:", text: "saferideshelp@gmail.com" },
+      { type: "lead", label: "Mail:", text: "Coetzee Tech, Inc. (d/b/a SafeRides™), 214 S Gregg Street, Columbia, SC 29205, United States" },
+      { type: "p", strong: true, text: "By using the SafeRides Services, you acknowledge that you have read and understand this Privacy Policy." },
+    ],
+  },
+];
+
+function renderBlock(block: Block, key: number) {
+  switch (block.type) {
+    case "h3":
+      return (
+        <h3 key={key} className="text-lg font-semibold text-[#1A1A1A] mt-6 mb-2">
+          {block.text}
+        </h3>
+      );
+    case "p":
+      return (
+        <p
+          key={key}
+          className={`text-[#1A1A1A] mb-3${block.strong ? " font-semibold" : ""}`}
+        >
+          {block.text}
+        </p>
+      );
+    case "lead":
+      return (
+        <p key={key} className="text-[#1A1A1A] mb-3">
+          <strong>{block.label}</strong> {block.text}
+        </p>
+      );
+    case "ul":
+      return (
+        <ul key={key} className="list-disc list-inside space-y-1 text-[#1A1A1A] mb-3">
+          {block.items.map((item, i) => (
+            <li key={i}>{item}</li>
+          ))}
+        </ul>
+      );
+    case "dl":
+      return (
+        <div key={key} className="space-y-2 mb-3">
+          {block.items.map((item, i) => (
+            <p key={i} className="text-[#1A1A1A]">
+              <strong>{item.term}</strong> {item.def}
+            </p>
+          ))}
+        </div>
+      );
+    default:
+      return null;
+  }
 }
 
 const Privacy = () => {
-  const [legalContent, setLegalContent] = useState<LegalContentState>({
-    content: "",
-    loading: true,
-  });
-
   useEffect(() => {
     document.title = "Privacy Policy - SafeRides";
-
-    let cancelled = false;
-
-    async function loadPrivacy() {
-      try {
-        const content = await loadLegalField("privacyContent");
-        if (!cancelled) setLegalContent({ content, loading: false });
-      } catch (error) {
-        console.error("Failed to load Privacy Policy from Firestore:", error);
-        if (!cancelled) setLegalContent({ content: "", loading: false });
-      }
-    }
-
-    void loadPrivacy();
-    return () => {
-      cancelled = true;
-    };
   }, []);
 
   return (
@@ -50,271 +381,37 @@ const Privacy = () => {
       <main>
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
           <header className="mb-8">
-            <h1 className="text-2xl font-bold text-gray-900">
-              SafeRides™ Privacy Policy (United States)
+            <h1 className="text-2xl font-bold text-[#1A1A1A]">
+              SafeRides™ Privacy Policy
             </h1>
-            <p className="text-sm text-gray-600 mt-2">
-              Effective Date: March 3, 2026 • Last Updated: March 3, 2026
+            <p className="text-sm text-[#6B7280] mt-2">
+              United States • Coetzee Tech, Inc. (d/b/a SafeRides) • Effective
+              Date: June 1, 2026 • Last Updated: June 1, 2026
             </p>
           </header>
+
           <div className="space-y-6 text-sm leading-relaxed">
-            {legalContent.loading ? (
-              <div className="py-12 text-center text-gray-700">Loading...</div>
-            ) : legalContent.content ? (
-              legalContent.content.startsWith("<") ? (
-                <div dangerouslySetInnerHTML={{ __html: legalContent.content }} />
-              ) : (
-                <p className="text-gray-700" style={{ whiteSpace: "pre-wrap" }}>
-                  {legalContent.content}
-                </p>
-              )
-            ) : (
-              <>
-            <p className="text-gray-700">
-              This Privacy Policy explains how Coetzee Tech Inc. (doing business as SafeRides™, &quot;SafeRides,&quot; &quot;we,&quot; &quot;us,&quot; or &quot;our&quot;) collects, uses, shares, and protects information when you use our services in the United States (the &quot;Services&quot;), including our mobile applications, websites, and related features (such as ride requests, driver onboarding, scheduling, safety tools, and customer support).
-            </p>
+            {INTRO.map((block, i) => renderBlock(block, i))}
 
             <section>
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">1) Who We Are</h3>
-              <ul className="space-y-1 text-gray-700">
-                <li><strong>Company:</strong> Coetzee Tech Inc. (d/b/a SafeRides™)</li>
-                <li><strong>Business Address:</strong> 214 S Gregg St, Apt A, Columbia, SC 29205, United States</li>
-                <li><strong>Privacy Contact Email:</strong> saferideshelp@gmail.com</li>
-              </ul>
+              <h2 className="text-xl font-semibold text-[#1A1A1A] mt-8 mb-3">
+                Table of Contents
+              </h2>
+              <ol className="list-decimal list-inside space-y-1 text-[#1A1A1A]">
+                {TOC.map((item, i) => (
+                  <li key={i}>{item}</li>
+                ))}
+              </ol>
             </section>
 
-            <section>
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">2) Scope</h3>
-              <p className="text-gray-700 mb-2">This Privacy Policy applies to information we collect from:</p>
-              <ul className="space-y-1 text-gray-700 mb-2">
-                <li>• Riders who request or take rides</li>
-                <li>• Drivers who apply, are onboarded, and provide rides</li>
-                <li>• Visitors to our websites and support channels</li>
-                <li>• Users of related features (e.g., scheduled rides, referral programs, promotions)</li>
-              </ul>
-              <p className="text-gray-700">
-                <strong>US-only notice:</strong> Our Services covered by this policy are intended for use in the United States. We do not target or market Services to users outside the US under this policy.
-              </p>
-            </section>
-
-            <section>
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">3) Definitions (Quick)</h3>
-              <ul className="space-y-2 text-gray-700">
-                <li>• <strong>Personal Information / Personal Data:</strong> Information that identifies, relates to, describes, or could reasonably be linked to you.</li>
-                <li>• <strong>Sensitive Personal Information / Sensitive Data:</strong> Certain higher-risk categories (e.g., precise geolocation, government ID numbers, account logins, certain safety-related info), which may receive additional protections.</li>
-                <li>• <strong>Processing:</strong> Any operation performed on data (collection, use, storage, sharing, deletion, etc.).</li>
-              </ul>
-            </section>
-
-            <section>
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">4) Information We Collect</h3>
-              <p className="text-gray-700 mb-3">We collect information in three main ways: (A) you give it to us, (B) we collect it automatically when you use the Services, and (C) we receive it from third parties.</p>
-
-              <h4 className="font-semibold text-gray-800 mb-2">A) Information You Provide</h4>
-              <div className="space-y-3 mb-4">
-                <div>
-                  <p className="font-medium text-gray-800 mb-1">1) Account and Profile Information</p>
-                  <ul className="space-y-1 text-gray-700 list-disc list-inside">
-                    <li>Name</li>
-                    <li>Email address and/or phone number</li>
-                    <li>Profile photo (optional, or required for drivers)</li>
-                    <li>Password and authentication details</li>
-                    <li>University/school email or verification signals (if applicable to your campus model)</li>
-                    <li>Preferred settings (e.g., accessibility needs, safety preferences)</li>
-                  </ul>
-                </div>
-                <div>
-                  <p className="font-medium text-gray-800 mb-1">2) Rider Information</p>
-                  <ul className="space-y-1 text-gray-700 list-disc list-inside">
-                    <li>Pickup location and drop-off location (including preset suggestions you choose)</li>
-                    <li>Ride requests and ride preferences (e.g., type of ride, price option)</li>
-                    <li>Scheduled ride details (destination, date, time)</li>
-                    <li>Payment method details (we typically receive tokens and limited card details from payment processors, not full card numbers)</li>
-                    <li>Promo codes, discounts, referral codes</li>
-                    <li>Communications with drivers and customer support</li>
-                  </ul>
-                </div>
-                <div>
-                  <p className="font-medium text-gray-800 mb-1">3) Driver Information</p>
-                  <p className="text-gray-700 mb-1">In addition to the above, drivers may provide:</p>
-                  <ul className="space-y-1 text-gray-700 list-disc list-inside">
-                    <li>Driver&apos;s license and other government-issued IDs</li>
-                    <li>Vehicle information (make/model/year, plate number, insurance details, inspection info if required)</li>
-                    <li>Background check information (subject to vendor processes and applicable law)</li>
-                    <li>Banking/payout details (often handled through a payment processor onboarding flow)</li>
-                    <li>Tax-related information if required for payouts</li>
-                    <li>Driver availability and ride preference selections (e.g., which ride types you&apos;ll accept)</li>
-                  </ul>
-                </div>
-                <div>
-                  <p className="font-medium text-gray-800 mb-1">4) Safety and Support Information</p>
-                  <ul className="space-y-1 text-gray-700 list-disc list-inside">
-                    <li>Incident reports (safety issues, complaints, disputes, lost items)</li>
-                    <li>Evidence you provide (messages, screenshots, photos)</li>
-                    <li>Emergency contact info (if you choose to add it)</li>
-                    <li>Verification code or &quot;ride PIN&quot; you set (if your product uses a rider-set code)</li>
-                  </ul>
-                  <p className="text-gray-700 mt-2 text-xs italic">Note: If you contact customer support by phone or in-app, we may collect the details of the interaction. If call recording is enabled, you&apos;ll be notified where required by law.</p>
-                </div>
-              </div>
-
-              <h4 className="font-semibold text-gray-800 mb-2">B) Information We Collect Automatically When You Use the Services</h4>
-              <div className="space-y-3 mb-4">
-                <div>
-                  <p className="font-medium text-gray-800 mb-1">1) Location Information</p>
-                  <p className="text-gray-700 mb-1">We may collect:</p>
-                  <ul className="space-y-1 text-gray-700 list-disc list-inside">
-                    <li>Precise geolocation from your device (with your permission) to enable pickup, routing, ETAs, geofencing, safety features, and fraud prevention.</li>
-                    <li>Trip route details during a ride (e.g., start location, route path, drop-off).</li>
-                    <li>Driver location while online/available and during trips (to match riders and provide ETAs).</li>
-                  </ul>
-                  <p className="text-gray-700 mt-2">You can often control location permissions in your device settings. Some features will not work without location access.</p>
-                </div>
-                <div>
-                  <p className="font-medium text-gray-800 mb-1">2) Usage and Device Data</p>
-                  <ul className="space-y-1 text-gray-700 list-disc list-inside">
-                    <li>Device model, OS version</li>
-                    <li>App version</li>
-                    <li>Device identifiers (e.g., advertising ID where permitted, push notification token)</li>
-                    <li>IP address, approximate location derived from IP</li>
-                    <li>Crash logs, performance logs, diagnostic data</li>
-                    <li>App interaction data (screens viewed, clicks/taps, session duration)</li>
-                  </ul>
-                </div>
-                <div>
-                  <p className="font-medium text-gray-800 mb-1">3) Communications and Content</p>
-                  <ul className="space-y-1 text-gray-700 list-disc list-inside">
-                    <li>Messages sent through the app (where messaging exists)</li>
-                    <li>Time and date of communications</li>
-                    <li>Delivery and read receipts (if enabled)</li>
-                  </ul>
-                </div>
-                <div>
-                  <p className="font-medium text-gray-800 mb-1">4) Cookies and Similar Technologies (Web)</p>
-                  <p className="text-gray-700">When you use our websites: Cookies, pixels, and similar tools to keep you logged in, remember preferences, measure performance, and support marketing (see Section 10).</p>
-                </div>
-              </div>
-
-              <h4 className="font-semibold text-gray-800 mb-2">C) Information We Receive From Third Parties</h4>
-              <p className="text-gray-700 mb-1">We may receive information from:</p>
-              <ul className="space-y-1 text-gray-700 list-disc list-inside">
-                <li>Identity verification and background check providers (drivers)</li>
-                <li>Payment processors (e.g., to confirm successful payments, chargebacks, payout onboarding status)</li>
-                <li>Mapping and navigation providers (e.g., for geocoding, directions, route estimates)</li>
-                <li>Analytics and attribution providers (to understand performance and install sources)</li>
-                <li>Marketing partners (where permitted)</li>
-                <li>Insurance carriers, claims administrators, and safety partners (if incidents occur)</li>
-                <li>Law enforcement or government authorities (where legally required or permitted)</li>
-              </ul>
-            </section>
-
-            <section>
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">5) How We Use Information</h3>
-              <p className="text-gray-700 mb-2">We use information to operate, improve, and protect SafeRides. Common purposes include:</p>
-              <ul className="space-y-2 text-gray-700">
-                <li><strong>A) Provide the Services:</strong> Create and manage accounts; enable ride requests, matching, and routing; process payments and payouts; provide receipts and trip history; provide customer support and respond to requests; run scheduled rides and notify drivers/riders.</li>
-                <li><strong>B) Safety, Trust, and Security:</strong> Verify identity (especially for driver onboarding); run background checks where permitted/required; detect and prevent fraud, abuse, and unsafe activity; enforce policies (e.g., misuse, harassment, discrimination, payment abuse); support safety features (emergency support, incident response, rider/driver verification flows).</li>
-                <li><strong>C) Improve and Personalize:</strong> Fix bugs and optimize performance; understand feature usage and improve UX; personalize content (e.g., suggestions, preferences).</li>
-                <li><strong>D) Communications:</strong> Send service messages (trip updates, confirmations, security alerts); respond to support tickets; send marketing messages where permitted (you can opt out).</li>
-                <li><strong>E) Legal and Compliance:</strong> Meet legal obligations; resolve disputes; maintain business records; protect rights, safety, and property.</li>
-              </ul>
-            </section>
-
-            <section>
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">6) How We Share Information</h3>
-              <p className="text-gray-700 mb-2">
-                We do not sell your personal information in the way most people mean &quot;sell&quot; (i.e., handing your data to random third parties for cash). But some US state laws define &quot;sale&quot; and &quot;sharing&quot; broadly (including certain targeted advertising). We address opt-outs in Section 12.
-              </p>
-              <p className="text-gray-700 mb-2">We may share information with:</p>
-              <ul className="space-y-2 text-gray-700">
-                <li><strong>A) Between Riders and Drivers (Core Rideshare Function):</strong> Rider first name and profile photo (if provided); pickup and drop-off locations (or approximate until pickup); trip status, ETA, and route guidance; vehicle and driver details (name, photo, vehicle make/model/plate); safety-related information necessary to complete the ride.</li>
-                <li><strong>B) Service Providers (Vendors/Processors):</strong> Cloud hosting and databases; payment processing and payout onboarding; SMS/email delivery providers; customer support tools; analytics tools; mapping/geocoding and route providers; identity verification and background check providers (drivers). They may process data only on our instructions (or as otherwise permitted by law and contract).</li>
-                <li><strong>C) Affiliates and Business Transfers:</strong> If SafeRides is involved in a merger, acquisition, financing, or asset sale, information may be transferred as part of that transaction (subject to applicable law).</li>
-                <li><strong>D) Legal, Safety, and Enforcement:</strong> Law enforcement, courts, regulators, or government agencies when required or permitted by law; third parties to protect rights, safety, and security; insurance carriers or claims administrators when relevant to an incident.</li>
-                <li><strong>E) With Your Consent:</strong> If you choose to connect SafeRides to a third-party service or explicitly ask us to share information, we will do so with your permission.</li>
-              </ul>
-            </section>
-
-            <section>
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">7) Data Retention</h3>
-              <p className="text-gray-700 mb-2">We retain information only as long as necessary for the purposes described in this policy, including to: provide the Services; meet legal and accounting obligations; resolve disputes; enforce policies and prevent fraud.</p>
-              <p className="text-gray-700 mb-2">Retention depends on the type of data:</p>
-              <ul className="space-y-1 text-gray-700">
-                <li>• Account data may be retained while your account is active.</li>
-                <li>• Trip and payment records may be retained longer for legal, tax, and accounting reasons.</li>
-                <li>• Safety and incident records may be retained longer where needed to protect users and the platform.</li>
-                <li>• When you request deletion, we may still keep certain information to comply with law or for legitimate business needs.</li>
-              </ul>
-            </section>
-
-            <section>
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">8) Security</h3>
-              <p className="text-gray-700">
-                We use administrative, technical, and physical safeguards designed to protect information. No system is perfectly secure, and we cannot guarantee absolute security. You are responsible for keeping your login credentials confidential and for using device-level security features.
-              </p>
-            </section>
-
-            <section>
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">9) Your Controls and Choices</h3>
-              <ul className="space-y-2 text-gray-700">
-                <li><strong>A) Account Information:</strong> You can review and update certain profile information in the app.</li>
-                <li><strong>B) Location Controls:</strong> You can control location permissions at the device level. If you deny location access, features like ride matching, routing, and geofencing may not work.</li>
-                <li><strong>C) Marketing Preferences:</strong> You can opt out of marketing emails via the unsubscribe link. Under the US CAN-SPAM rules, businesses must honor opt-out requests within 10 business days.</li>
-                <li><strong>D) Push Notifications:</strong> You can disable push notifications in your device settings (some service notifications may be important for trips and safety).</li>
-              </ul>
-            </section>
-
-            <section>
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">10) Cookies, Analytics, and Advertising (Web + App)</h3>
-              <p className="text-gray-700 mb-2">We may use cookies, SDKs, pixels, and similar tools to: keep you logged in; remember preferences; measure traffic and app performance; understand user journeys; support marketing and attribution.</p>
-              <p className="text-gray-700 mb-2"><strong>Targeted Advertising and &quot;Sale/Share&quot; Concepts:</strong> Some state laws treat certain ad-tech disclosures as a &quot;sale&quot; or &quot;sharing&quot; of personal data for targeted advertising. If we engage in targeted advertising, you may have the right to opt out (see Section 12).</p>
-              <p className="text-gray-700">
-                <strong>Global Privacy Control / Universal Opt-Out Signals:</strong> Certain states require recognizing browser-based opt-out signals (like Global Privacy Control) for opt-outs of sale/targeted ads. Regulators have actively enforced compliance sweeps related to these signals.
-              </p>
-            </section>
-
-            <section>
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">11) Children&apos;s Privacy</h3>
-              <p className="text-gray-700">
-                SafeRides is not directed to children under 13, and we do not knowingly collect personal information from children under 13. COPPA imposes requirements on services directed to children under 13 or that knowingly collect their data. If you believe a child under 13 has provided us information, contact us and we will take appropriate steps to delete it. (Separately: if SafeRides requires users to be 18+ or 21+ due to rideshare safety policies, that requirement should also be stated in your Terms.)
-              </p>
-            </section>
-
-            <section>
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">12) US State Privacy Rights Addendum</h3>
-              <p className="text-gray-700 mb-2">US privacy laws vary by state and continue to evolve. Below is a practical, SafeRides-friendly rights section that covers major state privacy regimes.</p>
-              <p className="text-gray-700 mb-2"><strong>How to exercise rights:</strong> Email saferideshelp@gmail.com with subject line &quot;Privacy Request&quot; and include: Your full name; Email/phone used for the account; State of residence; The request type (Access / Delete / Correct / Portability / Opt Out / Appeal). We may need to verify your identity before fulfilling a request (to protect you from fraud). If you use an authorized agent (where allowed), we may require proof of authorization and still verify you directly.</p>
-              <div className="space-y-2 text-gray-700">
-                <p><strong>A) California (CCPA/CPRA):</strong> California&apos;s CPRA amendments are in effect as of January 1, 2023. California requires businesses to respond to certain verified requests within 45 days (with a possible extension). California rights may include: Right to know/access; Right to delete; Right to correct; Right to opt out of &quot;sale&quot; and/or &quot;sharing&quot;; Right to limit use of sensitive personal information; Right to non-discrimination. &quot;Do Not Sell or Share&quot;: If we engage in activities covered by &quot;sale&quot; or &quot;sharing&quot; definitions, you can opt out through the methods above. We also aim to honor eligible opt-out preference signals where required.</p>
-                <p><strong>B) Virginia (VCDPA), C) Colorado (CPA), D) Connecticut (CTDPA), E) Utah (UCPA), F) Texas (TDPSA), G) Oregon (OCPA), H) Montana (MTCDPA), I) Tennessee (TIPA), J) Iowa (ICDPA), K) Delaware (DPDPA), L) New Jersey (NJDPA), M) New Hampshire (NHDPA), N) Florida (Digital Bill of Rights), O) Indiana (INCDPA), P) Kentucky (KCDPA), Q) Rhode Island (RIDTPPA):</strong> These states have enacted privacy laws with varying effective dates. Rights generally include access, deletion, correction, portability, and opt-out of targeted advertising, sale, and certain profiling where applicable.</p>
-              </div>
-              <p className="text-gray-700 mt-2"><strong>Rights We Offer Where Applicable (Summary):</strong> Depending on your state, you may have the right to: Access; Delete; Correct; Portability; Opt out (targeted advertising, &quot;sale&quot;, certain profiling); Appeal. If we deny a request, we&apos;ll explain why and provide an appeal method when applicable.</p>
-            </section>
-
-            <section>
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">13) &quot;Do Not Sell or Share&quot; and Targeted Advertising Opt-Out</h3>
-              <p className="text-gray-700">
-                If state law gives you the right to opt out of: targeted advertising; sale of personal data; sharing for cross-context behavioral advertising (California terminology)—you can submit an opt-out request via saferideshelp@gmail.com. We also aim to honor legally recognized opt-out preference signals (such as Global Privacy Control) where required.
-              </p>
-            </section>
-
-            <section>
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">14) Changes to This Privacy Policy</h3>
-              <p className="text-gray-700">
-                We may update this Privacy Policy from time to time. If we make material changes, we will provide notice through the app, our website, or by other means as required by law. The &quot;Last Updated&quot; date at the top indicates when this policy was most recently revised.
-              </p>
-            </section>
-
-            <section>
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">15) Contact Us</h3>
-              <p className="text-gray-700 mb-2">For questions, complaints, or privacy requests:</p>
-              <ul className="space-y-1 text-gray-700">
-                <li><strong>Email:</strong> saferideshelp@gmail.com</li>
-                <li><strong>Mail:</strong> Coetzee Tech Inc. (SafeRides™), 214 S Gregg St, Apt A, Columbia, SC 29205, United States</li>
-              </ul>
-            </section>
-              </>
-            )}
+            {SECTIONS.map((section, i) => (
+              <section key={i}>
+                <h2 className="text-xl font-semibold text-[#1A1A1A] mt-8 mb-3">
+                  {section.heading}
+                </h2>
+                {section.blocks.map((block, j) => renderBlock(block, j))}
+              </section>
+            ))}
           </div>
         </div>
       </main>
